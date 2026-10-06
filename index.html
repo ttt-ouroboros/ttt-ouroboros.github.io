@@ -1,0 +1,1919 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>TTT Ouroboros</title>
+<meta name="description" content="A story-style project page for 'Self-Generated Feedback Destabilizes Test-Time Training: A Causal Decomposition of Long-Horizon Adaptation' (Luo, Li, Ghanem; KAUST). English and 中文.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Courier+Prime:wght@400;700&family=Noto+Serif+SC:wght@400;600&family=ZCOOL+KuaiLe&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/roughjs@4.6.6/bundled/rough.js"></script>
+<style>
+/* Layout: a research notebook. One story column (~40rem) with handwritten margin notes on wide screens;
+   chapter 4 is a scrollytelling spread (sticky sketch + steps). Everything drawn is pencil line-art.
+   Color: dot-grid paper + graphite ink; three highlighter inks carry the experimental conditions everywhere:
+   orange = Closed Loop, blue = Fixed Generation, green = Settlement; pencil gray = Writes Off.
+   Dark mode is a chalkboard with the same roles. Bilingual: .en / .zh pairs, switched by :root[data-lang]. */
+:root {
+  --paper: #f6f8fa;
+  --dots: #d3dae3;
+  --card: #ffffff;
+  --ink: #1c2331;
+  --pencil: #4f596b;
+  --faint: #7d8697;
+  --rule: #cdd5df;
+  --c-closed: #e8692a;
+  --c-fixed: #2f7fd8;
+  --c-settle: #14a06c;
+  --c-off: #8d95a3;
+  --hl-closed: rgba(255, 140, 70, .34);
+  --hl-fixed: rgba(80, 150, 240, .26);
+  --hl-settle: rgba(30, 200, 130, .28);
+  --tip-bg: #1c2331;
+  --tip-fg: #f6f8fa;
+  --f-hand: "Kalam", "ZCOOL KuaiLe", "Comic Neue", "Segoe Print", cursive;
+  --f-body: "Source Serif 4", "Noto Serif SC", "Songti SC", Georgia, serif;
+  --f-type: "Courier Prime", "Courier New", ui-monospace, monospace;
+  --fsz: 1;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #1b2220; --dots: #2b3532; --card: #212a27; --ink: #e8ede9; --pencil: #b7c0bb; --faint: #8a958f; --rule: #36423e;
+    --c-closed: #e0703a; --c-fixed: #4a8fe0; --c-settle: #1fa877; --c-off: #87918c;
+    --hl-closed: rgba(224, 112, 58, .34); --hl-fixed: rgba(74, 143, 224, .3); --hl-settle: rgba(31, 168, 119, .32);
+    --tip-bg: #e8ede9; --tip-fg: #1b2220; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #1b2220; --dots: #2b3532; --card: #212a27; --ink: #e8ede9; --pencil: #b7c0bb; --faint: #8a958f; --rule: #36423e;
+  --c-closed: #e0703a; --c-fixed: #4a8fe0; --c-settle: #1fa877; --c-off: #87918c;
+  --hl-closed: rgba(224, 112, 58, .34); --hl-fixed: rgba(74, 143, 224, .3); --hl-settle: rgba(31, 168, 119, .32);
+  --tip-bg: #e8ede9; --tip-fg: #1b2220; color-scheme: dark;
+}
+:root[data-lang="zh"] .en, :root:not([data-lang="zh"]) .zh { display: none !important; }
+
+* { box-sizing: border-box; }
+html { scroll-padding-top: 70px; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  background-color: var(--paper);
+  background-image: radial-gradient(var(--dots) 1.1px, transparent 1.3px);
+  background-size: 22px 22px;
+  color: var(--ink); font-family: var(--f-body); font-size: calc(18px * var(--fsz)); line-height: 1.66;
+  -webkit-font-smoothing: antialiased; overflow-x: hidden;
+}
+:root[data-lang="zh"] body { line-height: 1.85; letter-spacing: .01em; }
+a { color: var(--ink); text-decoration-color: var(--c-closed); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, input:focus-visible, .step:focus-visible, #snake:focus-visible { outline: 2px dashed var(--ink); outline-offset: 3px; }
+button { -webkit-tap-highlight-color: transparent; }
+.n { font-family: var(--f-hand); font-weight: 700; white-space: nowrap; }
+sub, sup { line-height: 0; }
+
+.sketch { border: 1.6px solid var(--ink); border-radius: 255px 14px 225px 14px / 14px 225px 14px 255px; }
+mark {
+  color: inherit; padding: 0 .1em; background-color: transparent; background-repeat: no-repeat; background-size: 100% 100%;
+  background-image: linear-gradient(transparent 52%, var(--hl-closed) 52%, var(--hl-closed) 92%, transparent 92%);
+  transition: background-size .9s cubic-bezier(.3, .7, .3, 1);
+}
+mark.g { background-image: linear-gradient(transparent 52%, var(--hl-settle) 52%, var(--hl-settle) 92%, transparent 92%); }
+mark.b { background-image: linear-gradient(transparent 52%, var(--hl-fixed) 52%, var(--hl-fixed) 92%, transparent 92%); }
+mark.pre { background-size: 0% 100%; }
+
+/* ---------- top bar ---------- */
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 30; background: var(--paper); border-bottom: 1.5px solid var(--ink); }
+.bar-in { max-width: 72rem; margin: 0 auto; padding: 0 20px; height: 52px; display: flex; align-items: center; gap: 16px; }
+.brand { font-family: var(--f-hand); font-weight: 700; font-size: 20px; text-decoration: none; white-space: nowrap; }
+.bar nav { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; min-width: 0; flex: 1; }
+.bar nav::-webkit-scrollbar { display: none; }
+.navlinks a { font-family: var(--f-hand); font-size: 15px; color: var(--pencil); text-decoration: none; padding: 4px 8px; white-space: nowrap; border-radius: 6px; }
+.navlinks a b { font-weight: 700; color: var(--faint); margin-right: 3px; }
+.navlinks a:hover, .navlinks a.on { color: var(--ink); background: linear-gradient(transparent 55%, var(--hl-closed) 55%, var(--hl-closed) 90%, transparent 90%); }
+.tools { display: flex; gap: 8px; align-items: center; margin-left: auto; }
+.tool {
+  font-family: var(--f-hand); font-weight: 700; font-size: 15px; color: var(--ink); background: var(--card); cursor: pointer;
+  border: 1.4px solid var(--ink); border-radius: 255px 12px 225px 12px / 12px 225px 12px 255px; padding: 3px 10px 2px; min-height: 34px; white-space: nowrap;
+}
+.tool.lang { background: var(--ink); color: var(--paper); }
+#menuBtn { display: none; }
+.progress { position: absolute; left: 0; right: 0; bottom: -1.5px; height: 3px; background: var(--c-closed); transform-origin: 0 50%; transform: scaleX(0); }
+@media (max-width: 900px) {
+  .bar nav.navlinks { display: none; }
+  #menuBtn { display: inline-flex; align-items: center; }
+  .bar-in { padding: 0 14px; gap: 10px; }
+}
+@media (max-width: 380px) { .brand { font-size: 17px; } .tool { padding: 3px 8px 2px; } }
+
+/* bottom sheet (phones / tablets) */
+.sheet { position: fixed; inset: 0; z-index: 60; }
+.sheet-back { position: absolute; inset: 0; background: rgba(10, 14, 20, .35); }
+.sheet-panel {
+  position: absolute; left: 10px; right: 10px; bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  max-height: 78vh; overflow-y: auto; background: var(--card); padding: 14px 16px 12px;
+  animation: sheetUp .28s cubic-bezier(.2, .9, .3, 1);
+}
+@keyframes sheetUp { from { transform: translateY(30px); opacity: 0; } to { transform: none; opacity: 1; } }
+.sheet-h { display: flex; justify-content: space-between; align-items: center; font-family: var(--f-hand); font-weight: 700; font-size: 20px; margin-bottom: 6px; }
+.sheet-h button { font-size: 22px; background: none; border: 0; color: var(--ink); cursor: pointer; min-width: 44px; min-height: 44px; }
+#sheetNav { display: grid; }
+#sheetNav a { font-size: 18px; padding: 11px 6px; border-bottom: 1.4px dashed var(--rule); border-radius: 0; }
+#sheetNav a:last-child { border-bottom: 0; }
+#sheetNav a.on { background: none; color: var(--c-closed); font-weight: 700; }
+
+/* floating back-to-top */
+.fab {
+  position: fixed; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 25;
+  width: 46px; height: 46px; display: grid; place-items: center; cursor: pointer;
+  font-family: var(--f-hand); font-size: 22px; font-weight: 700; color: var(--ink); background: var(--card);
+  border: 1.6px solid var(--ink); border-radius: 50% 46% 52% 48%; box-shadow: 2px 3px 0 var(--ink);
+  transition: opacity .25s, transform .25s;
+}
+.fab.off { opacity: 0; transform: translateY(12px); pointer-events: none; }
+
+/* ---------- frame ---------- */
+.page { max-width: 72rem; margin: 0 auto; padding-inline: 20px; padding-block: 0 90px; }
+.row { display: grid; grid-template-columns: minmax(0, 40rem) minmax(0, 15rem); gap: 0 56px; }
+.row > * { min-width: 0; }
+.note {
+  font-family: var(--f-hand); font-size: calc(16.5px * var(--fsz)); line-height: 1.45; color: var(--pencil);
+  align-self: start; margin-top: 8px; transform: rotate(-1.4deg); position: relative; padding-left: 26px;
+}
+.note::before { content: "↖"; position: absolute; left: 0; top: -4px; font-size: 22px; color: var(--c-closed); }
+@media (max-width: 1080px) {
+  .row { grid-template-columns: minmax(0, 42rem); }
+  .note { transform: none; margin: 4px 0 18px; padding-left: 14px; border-left: 2px solid var(--c-closed); }
+  .note::before { display: none; }
+}
+section.chap { padding-block: 72px 8px; }
+.chap-n { font-family: var(--f-hand); font-size: 18px; color: var(--c-closed); font-weight: 700; display: inline-block; transform: rotate(-2deg); }
+h2 { font-family: var(--f-hand); font-weight: 700; font-size: clamp(30px, 4.8vw, 48px); line-height: 1.12; margin: 4px 0 20px; text-wrap: balance; }
+h3 { font-family: var(--f-hand); font-weight: 700; font-size: 25px; line-height: 1.25; margin: 40px 0 8px; text-wrap: balance; }
+:root[data-lang="zh"] h1, :root[data-lang="zh"] h2, :root[data-lang="zh"] h3 { letter-spacing: .02em; }
+p { margin: 0 0 16px; }
+.lede { font-size: calc(21px * var(--fsz)); line-height: 1.55; }
+:root[data-lang="zh"] .lede { line-height: 1.8; }
+.quiet { color: var(--pencil); font-size: calc(16px * var(--fsz)); }
+
+/* ---------- hero ---------- */
+.hero { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, .7fr); gap: 28px 40px; align-items: center; padding-block: 52px 10px; }
+.hero > * { min-width: 0; }
+.kicker { font-family: var(--f-hand); color: var(--pencil); font-size: 16px; }
+.hero h1 { font-family: var(--f-hand); font-weight: 700; font-size: clamp(36px, 5.8vw, 64px); line-height: 1.06; margin: 10px 0 12px; text-wrap: balance; }
+.hero h1 mark { padding: 0 .06em; }
+.hero .orig { font-family: var(--f-hand); font-size: 17px; color: var(--pencil); margin: -4px 0 8px; }
+.hero .sub { font-style: italic; font-size: calc(21px * var(--fsz)); color: var(--pencil); margin: 0 0 22px; }
+.authors { font-size: 18px; display: flex; flex-wrap: wrap; gap: 2px 20px; }
+.affil { font-size: 15px; color: var(--pencil); }
+.links { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 22px; }
+.btn {
+  font-family: var(--f-hand); font-weight: 700; font-size: 17px; color: var(--ink); text-decoration: none; cursor: pointer;
+  background: var(--card); padding: 8px 18px 6px; display: inline-flex; gap: 8px; align-items: center; min-height: 42px;
+  border: 1.6px solid var(--ink); border-radius: 255px 14px 225px 14px / 14px 225px 14px 255px;
+  box-shadow: 2px 3px 0 var(--ink); transition: transform .12s, box-shadow .12s;
+}
+.btn:active { transform: translate(1px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+.btn.primary { background: var(--ink); color: var(--paper); }
+.btn.zhbtn { background: var(--hl-closed); }
+.snake-wrap { justify-self: center; width: 100%; max-width: 360px; text-align: center; }
+.snake-wrap svg { width: 100%; height: auto; display: block; cursor: pointer; }
+.snake-hint { font-family: var(--f-hand); font-size: 14px; color: var(--faint); }
+@media (max-width: 860px) { .hero { grid-template-columns: 1fr; padding-block: 36px 0; } .snake-wrap { max-width: 280px; } }
+
+.hook { margin-top: 40px; }
+.cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; margin: 34px 0 0; }
+.card { background: var(--card); padding: 16px 18px 14px; min-width: 0; transition: transform .25s; }
+.card:nth-child(1) { transform: rotate(-1deg); } .card:nth-child(2) { transform: rotate(.6deg); } .card:nth-child(3) { transform: rotate(-.4deg); }
+.card .big { font-family: var(--f-hand); font-weight: 700; font-size: 40px; line-height: 1; font-variant-numeric: tabular-nums; }
+.card .big.o { color: var(--c-closed); } .card .big.b { color: var(--c-fixed); } .card .big.g { color: var(--c-settle); }
+.card p { font-size: calc(15.5px * var(--fsz)); line-height: 1.5; margin: 8px 0 0; color: var(--pencil); }
+@media (max-width: 760px) { .cards { grid-template-columns: 1fr; gap: 16px; } .card { transform: none !important; } }
+@media (min-width: 761px) and (max-width: 1000px) { .cards { gap: 14px; } .card .big { font-size: 34px; } }
+
+/* ---------- figures ---------- */
+figure { margin: 26px 0 34px; }
+.fig-h { font-family: var(--f-hand); font-weight: 700; font-size: 19px; line-height: 1.3; }
+.fig-s { font-family: var(--f-hand); font-size: 14.5px; color: var(--faint); margin-bottom: 8px; }
+figcaption { font-size: calc(15px * var(--fsz)); color: var(--pencil); line-height: 1.55; margin-top: 8px; }
+figcaption b { color: var(--ink); }
+.chart { width: 100%; min-width: 0; }
+.chart svg { display: block; overflow: visible; }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 36px; }
+.grid2 > * { min-width: 0; }
+.grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px 32px; }
+.grid3 > * { min-width: 0; }
+@media (max-width: 1000px) { .grid3 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .grid3 > :last-child { grid-column: 1 / -1; max-width: 32rem; } }
+@media (max-width: 700px) { .grid3, .grid2 { grid-template-columns: 1fr; } .grid3 > :last-child { max-width: none; } }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 18px; font-family: var(--f-hand); font-size: 15px; color: var(--pencil); margin-bottom: 6px; }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.legend i { width: 18px; height: 4px; border-radius: 3px; display: inline-block; }
+.legend i.dot { width: 11px; height: 11px; border-radius: 50%; }
+
+.viz text { font-family: var(--f-hand); font-size: 14px; fill: var(--pencil); }
+.viz .t-l { fill: var(--ink); font-size: 15.5px; }
+.viz .t-s { fill: var(--faint); font-size: 13px; }
+.viz .t-v { fill: var(--ink); font-size: 15.5px; font-weight: 700; }
+.viz .t-k { fill: var(--faint); font-size: 13px; }
+.viz .t-h { fill: var(--faint); font-size: 13px; letter-spacing: .08em; text-transform: uppercase; }
+.viz .grid { stroke: var(--rule); stroke-width: 1; stroke-dasharray: 2 4; }
+.viz .hit { fill: transparent; }
+
+/* diagrams */
+.diagram { width: 100%; height: auto; display: block; }
+.d-t { font: 700 17px var(--f-hand); fill: var(--ink); }
+.d-s { font: 400 14.5px var(--f-hand); fill: var(--pencil); }
+.d-e { font: 400 14.5px var(--f-hand); fill: var(--pencil); }
+.d-n { font: 400 15px var(--f-hand); fill: var(--faint); }
+.d-sm { font-size: 13px; }
+.d-big { font: 700 22px var(--f-hand); fill: var(--ink); }
+.d-o { font: 700 17px var(--f-hand); fill: var(--c-closed); }
+.d-g { font: 700 16px var(--f-hand); fill: var(--c-settle); }
+.pair-label { font-family: var(--f-hand); font-weight: 700; font-size: 19px; margin-bottom: 2px; }
+.pair-label span { font-weight: 400; color: var(--pencil); font-size: 16px; }
+
+/* controls */
+.seg { display: inline-flex; flex-wrap: wrap; gap: 6px; }
+.seg button {
+  font-family: var(--f-hand); font-size: 16px; color: var(--pencil); background: transparent; cursor: pointer; min-height: 36px;
+  border: 1.4px solid var(--rule); padding: 3px 12px 2px; border-radius: 255px 12px 225px 12px / 12px 225px 12px 255px;
+  transition: box-shadow .15s, transform .15s;
+}
+.seg button[aria-pressed="true"] { color: var(--ink); border-color: var(--ink); background: var(--card); box-shadow: 2px 2px 0 var(--ink); }
+.ctrl { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin: 6px 0 14px; }
+.ctrl label { font-family: var(--f-hand); font-size: 16px; color: var(--pencil); }
+.ctrl .val { font-family: var(--f-hand); font-weight: 700; font-size: 18px; min-width: 3.5em; }
+input[type=range] { accent-color: var(--ink); width: min(100%, 300px); height: 32px; }
+@media (pointer: coarse) {
+  .seg button { min-height: 42px; padding: 6px 14px 4px; }
+  input[type=range] { height: 40px; }
+}
+
+#tip {
+  position: fixed; z-index: 70; pointer-events: none; max-width: 280px;
+  background: var(--tip-bg); color: var(--tip-fg); font: 400 15px/1.45 var(--f-hand);
+  padding: 7px 11px 6px; border-radius: 10px 4px 10px 4px; box-shadow: 3px 3px 0 rgba(0,0,0,.18);
+}
+
+/* hover only where hovering exists */
+@media (hover: hover) {
+  .btn:hover, .tool:hover { transform: translate(-1px, -1px); box-shadow: 3px 4px 0 var(--ink); }
+  .seg button:hover { color: var(--ink); border-color: var(--pencil); }
+  .card:hover { transform: rotate(0deg) translateY(-4px) !important; }
+  .viz .hit:hover { fill: var(--hl-closed); opacity: .35; }
+  .step:hover .step-card { opacity: .75; }
+}
+
+/* ---------- reading / writing panels ---------- */
+.rw { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; margin: 24px 0 8px; max-width: 56rem; }
+.rw > div { background: var(--card); padding: 14px 16px; min-width: 0; }
+.rw h4 { margin: 0 0 4px; font-family: var(--f-hand); font-size: 21px; }
+.rw p { font-size: calc(16px * var(--fsz)); margin: 0; color: var(--pencil); line-height: 1.55; }
+.rw svg { width: 100%; height: 90px; display: block; margin-bottom: 6px; }
+@media (max-width: 600px) { .rw { grid-template-columns: 1fr; } }
+.formula { font-family: var(--f-hand); font-size: 22px; text-align: center; padding: 14px 10px; margin: 18px 0; background: var(--card); overflow-x: auto; }
+.formula small { display: block; font-size: 15px; color: var(--pencil); margin-top: 4px; }
+
+/* ---------- guess game ---------- */
+.guess { background: var(--card); padding: 18px 20px 16px; margin: 26px 0 8px; max-width: 46rem; }
+.guess p { font-size: calc(17px * var(--fsz)); margin-bottom: 8px; }
+.guess .msg { font-family: var(--f-hand); font-size: 17px; min-height: 1.5em; margin: 6px 0 0; }
+
+/* ---------- scrollytelling ---------- */
+.scrolly { display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(0, .88fr); gap: 44px; margin-top: 24px; }
+.scrolly > * { min-width: 0; }
+.graphic { position: sticky; top: calc(70px + env(safe-area-inset-top, 0px)); align-self: start; }
+.graphic .tag { font-family: var(--f-hand); font-size: 15px; color: var(--faint); margin-top: 4px; min-height: 1.4em; }
+.case-dots { display: flex; gap: 8px; margin-top: 6px; }
+.case-dots button {
+  width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid var(--ink); background: var(--card); cursor: pointer;
+  font-family: var(--f-hand); font-weight: 700; font-size: 14px; color: var(--ink); padding: 0; transition: background .2s, color .2s;
+}
+.case-dots button.on { background: var(--ink); color: var(--paper); }
+.steps { padding-block: 10vh 30vh; }
+.step { min-height: 72vh; display: flex; align-items: center; cursor: pointer; }
+.step-card { background: var(--card); padding: 18px 20px 16px; opacity: .38; transition: opacity .35s, transform .35s; width: 100%; }
+.step.on .step-card { opacity: 1; transform: translateX(-4px); }
+.step h4 { font-family: var(--f-hand); font-size: 23px; margin: 0 0 6px; line-height: 1.25; }
+.step .who { font-family: var(--f-hand); font-size: 15px; color: var(--faint); }
+.step p { font-size: calc(16.5px * var(--fsz)); line-height: 1.6; margin: 0 0 10px; }
+.step .res { font-family: var(--f-hand); font-size: 17px; }
+.stamp {
+  display: inline-block; font-family: var(--f-hand); font-weight: 700; font-size: 15px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--c-closed); border: 2.4px solid currentColor; padding: 1px 10px 0; margin-top: 6px;
+  border-radius: 7px 12px 6px 10px; transform: rotate(-4deg);
+}
+.stamp.b { color: var(--c-fixed); }
+.step.on .stamp { animation: stampIn .5s cubic-bezier(.2, 1.6, .4, 1) .25s both; }
+@keyframes stampIn { from { transform: scale(1.9) rotate(-14deg); opacity: 0; } to { transform: scale(1) rotate(-4deg); opacity: 1; } }
+@media (max-width: 900px) {
+  .scrolly { grid-template-columns: 1fr; gap: 0; }
+  .graphic { top: calc(52px + env(safe-area-inset-top, 0px)); z-index: 5; background: var(--paper); padding: 8px 0 6px; border-bottom: 1.5px dashed var(--rule); }
+  .graphic .diagram { max-height: 46vh; }
+  .graphic .tag { font-size: 14px; min-height: 0; }
+  .case-dots { position: absolute; right: 0; bottom: 6px; }
+  .case-dots button { width: 26px; height: 26px; font-size: 13px; }
+  .steps { padding-block: 4vh 24vh; }
+  .step { min-height: 64vh; align-items: flex-start; padding-top: 4vh; }
+  .step.on .step-card { transform: none; }
+}
+@media (max-width: 900px) and (orientation: landscape) and (max-height: 520px) {
+  .graphic { position: relative; top: 0; }
+  .graphic .diagram { max-height: 70vh; }
+  .step { min-height: 0; padding-block: 12px; }
+  .step-card { opacity: 1; }
+}
+
+/* ---------- exposure strip ---------- */
+.strip { display: grid; grid-template-columns: repeat(35, minmax(0, 1fr)); gap: 3px; margin: 8px 0 4px; }
+.strip i {
+  aspect-ratio: 1 / 1.7; border-radius: 2px 3px 2px 3px; border: 1.2px solid var(--c-closed); max-width: 100%;
+  background-color: transparent; background-image: repeating-linear-gradient(-45deg, var(--hl-closed) 0 1.5px, transparent 1.5px 4px);
+  transition: background-color .3s, border-color .3s, transform .3s; transition-delay: calc(var(--i, 0) * 5ms);
+}
+.strip i.real { background-color: var(--ink); background-image: none; border-color: var(--ink); transform: scaleY(1.06); }
+.strip i.burst { background-color: var(--c-closed); }
+@media (max-width: 520px) { .strip { grid-template-columns: repeat(21, minmax(0, 1fr)); gap: 2px; } }
+.strip-key { display: flex; flex-wrap: wrap; gap: 4px 18px; font-family: var(--f-hand); font-size: 15px; color: var(--pencil); }
+.strip-key span { display: inline-flex; gap: 7px; align-items: center; }
+.strip-key i { width: 11px; height: 17px; border-radius: 2px; display: inline-block; border: 1.2px solid var(--c-closed); }
+.readout { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 14px; }
+.readout > div { min-width: 0; border-top: 1.5px dashed var(--rule); padding-top: 6px; }
+.readout .k { font-family: var(--f-hand); font-size: 14.5px; color: var(--faint); line-height: 1.35; }
+.readout .v { font-family: var(--f-hand); font-weight: 700; font-size: 26px; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.readout .s { font-family: var(--f-hand); font-size: 14px; color: var(--pencil); }
+@media (max-width: 520px) { .readout { grid-template-columns: 1fr 1fr; } .readout > div:last-child { grid-column: 1 / -1; } }
+.pulse { animation: pulse .45s ease-out; }
+@keyframes pulse { 0% { transform: scale(1); } 40% { transform: scale(1.12); } 100% { transform: scale(1); } }
+
+/* ---------- misc blocks ---------- */
+.tbl-wrap { overflow-x: auto; margin: 12px 0 8px; -webkit-overflow-scrolling: touch; }
+table { border-collapse: collapse; width: 100%; min-width: 30rem; font-size: 15px; }
+th, td { padding: 8px 10px; text-align: left; border-bottom: 1.4px dashed var(--rule); vertical-align: baseline; }
+th { font-family: var(--f-hand); font-weight: 700; font-size: 15px; color: var(--pencil); border-bottom: 1.6px solid var(--ink); }
+td.r, th.r { text-align: right; font-family: var(--f-type); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.dotk { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 7px; }
+.algo { background: var(--card); padding: 16px 18px; overflow-x: auto; font: 14px/1.75 var(--f-type); margin: 0; color: var(--ink); }
+.algo .c { color: var(--faint); font-style: italic; }
+.algo .k { font-weight: 700; }
+.modes { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; margin-top: 16px; }
+@media (max-width: 1000px) { .modes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 480px) { .modes { grid-template-columns: 1fr; } }
+.mode { background: var(--card); padding: 14px 14px 12px; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.mode.best { border-color: var(--c-settle); box-shadow: 3px 3px 0 var(--c-settle); }
+.mode h4 { margin: 0; font-family: var(--f-hand); font-size: 18.5px; line-height: 1.25; }
+.mode p { font-size: calc(14.5px * var(--fsz)); margin: 0; color: var(--pencil); line-height: 1.5; }
+.mode svg { width: 100%; height: auto; display: block; }
+.mode .hb { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: auto; padding-top: 6px; border-top: 1.4px dashed var(--rule); }
+.mode .hb .k { font-family: var(--f-hand); font-size: 13.5px; color: var(--faint); }
+.mode .hb .v { font-family: var(--f-hand); font-weight: 700; font-size: 21px; }
+.lessons { list-style: none; padding: 0; margin: 20px 0 0; display: grid; gap: 14px; }
+.lessons li { background: var(--card); padding: 14px 18px 12px 58px; position: relative; font-size: calc(17px * var(--fsz)); line-height: 1.6; }
+.lessons li .num { position: absolute; left: 16px; top: 8px; font-family: var(--f-hand); font-weight: 700; font-size: 30px; color: var(--c-closed); }
+.lessons b { font-family: var(--f-hand); font-size: 19px; }
+.bib { position: relative; margin-top: 10px; }
+.bib pre { background: var(--card); padding: 18px; margin: 0; overflow-x: auto; font: 14px/1.6 var(--f-type); }
+.bib .btn { position: absolute; top: 12px; right: 12px; font-size: 15px; padding: 3px 12px 2px; min-height: 34px; }
+footer { margin-top: 56px; padding-top: 18px; border-top: 1.5px dashed var(--rule); font-family: var(--f-hand); font-size: 16px; color: var(--pencil); }
+@media (max-width: 520px) {
+  .page { padding-inline: 16px; }
+  section.chap { padding-block: 56px 4px; }
+  h3 { font-size: 22px; }
+  .formula { font-size: 18px; }
+  .lessons li { padding-left: 48px; }
+  .lessons li .num { left: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <div class="bar-in">
+    <a class="brand" href="#top">TTT Ouroboros</a>
+    <nav class="navlinks" id="nav" aria-label="Chapters">
+      <a href="#c1"><b>1</b><span class="en">Learning while reading</span><span class="zh">边读边学</span></a>
+      <a href="#c2"><b>2</b><span class="en">The loop</span><span class="zh">闭环</span></a>
+      <a href="#c3"><b>3</b><span class="en">The slow break</span><span class="zh">慢慢崩坏</span></a>
+      <a href="#c4"><b>4</b><span class="en">Three suspects</span><span class="zh">三个嫌疑人</span></a>
+      <a href="#c5"><b>5</b><span class="en">One update</span><span class="zh">一次更新</span></a>
+      <a href="#c6"><b>6</b><span class="en">A few bad runs</span><span class="zh">少数坏轨迹</span></a>
+      <a href="#c7"><b>7</b><span class="en">Half-fixes</span><span class="zh">治标不治本</span></a>
+      <a href="#c8"><b>8</b>Settlement</a>
+      <a href="#c9"><b>9</b><span class="en">Agents</span><span class="zh">智能体</span></a>
+      <a href="#cite"><span class="en">Cite</span><span class="zh">引用</span></a>
+    </nav>
+    <div class="tools">
+      <button class="tool" id="fsBtn" type="button" aria-label="Text size">Aa</button>
+      <button class="tool lang" id="langBtn" type="button"><span class="en" lang="zh-CN">中文</span><span class="zh">EN</span></button>
+      <button class="tool" id="menuBtn" type="button" aria-expanded="false" aria-controls="sheet">☰ <span class="en">&nbsp;Chapters</span><span class="zh">&nbsp;章节</span></button>
+    </div>
+  </div>
+  <div class="progress" id="progress"></div>
+</div>
+
+<div class="sheet" id="sheet" hidden>
+  <div class="sheet-back" data-close></div>
+  <div class="sheet-panel sketch" role="dialog" aria-modal="true" aria-label="Chapters">
+    <div class="sheet-h"><span><span class="en">Chapters</span><span class="zh">章节</span></span><button type="button" data-close aria-label="Close">×</button></div>
+    <nav class="navlinks" id="sheetNav"></nav>
+  </div>
+</div>
+
+<div class="page" id="top">
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div>
+    <div class="kicker">arXiv 2610.05076 · cs.CL · <span class="en">October 2026</span><span class="zh">2026 年 10 月</span></div>
+    <h1 class="en">Self-Generated Feedback Destabilizes <mark>Test-Time Training</mark></h1>
+    <h1 class="zh">自生成反馈让<mark>测试时训练</mark>失稳</h1>
+    <p class="orig zh">Self-Generated Feedback Destabilizes Test-Time Training</p>
+    <p class="sub"><span class="en">A causal decomposition of long-horizon adaptation</span><span class="zh">长时程适应的因果分解</span></p>
+    <div class="authors"><span>Cheng Luo</span><span>Bing Li<sup>*</sup></span><span>Bernard Ghanem</span></div>
+    <div class="affil"><span class="en">King Abdullah University of Science and Technology (KAUST) · <sup>*</sup>corresponding author</span><span class="zh">阿卜杜拉国王科技大学（KAUST）· <sup>*</sup>通讯作者</span></div>
+    <div class="links">
+      <a class="btn primary" href="https://arxiv.org/abs/2610.05076" target="_blank" rel="noopener"><span class="en">Paper</span><span class="zh">论文</span></a>
+      <a class="btn" href="https://arxiv.org/pdf/2610.05076v1" target="_blank" rel="noopener">PDF</a>
+      <a class="btn" href="https://github.com/lingjivoo/ttt-ouroboros" target="_blank" rel="noopener"><span class="en">Code</span><span class="zh">代码</span></a>
+      <a class="btn" href="#cite">BibTeX</a>
+      <button class="btn zhbtn" type="button" data-lang-switch><span class="en" lang="zh-CN">中文版 →</span><span class="zh">English →</span></button>
+    </div>
+  </div>
+  <div class="snake-wrap">
+    <svg id="snake" viewBox="0 0 400 400" role="img" tabindex="0" aria-label="Sketch of a snake eating its own tail, labeled with the self-training loop"></svg>
+    <div class="snake-hint"><span class="en">tap the snake to redraw it</span><span class="zh">点一下蛇，重新画一遍</span></div>
+  </div>
+</header>
+
+<div class="hook row">
+  <div>
+    <p class="lede en">Some language models keep learning while they read. That is the promise of test-time training. Now give such a model a long stream of <mark>its own writing</mark> to learn from. Over 128K tokens it slowly gets worse at reading everyone else's.</p>
+    <p class="lede zh">有些语言模型会边读边学，这正是测试时训练的卖点。现在，让这样一个模型拿<mark>自己写出的文字</mark>来学习。读完 128K 个 token 之后，它读懂别人文字的能力在一点点变差。</p>
+    <p class="en">This page tells the story of how we tracked down why, one controlled comparison at a time, and of a simple rule that stops it: <mark class="g">check an update on real text before you keep it.</mark></p>
+    <p class="zh">这一页讲的是我们如何用一组组对照实验，一步步找出原因；以及一条能阻止它的简单规则：<mark class="g">先在真实文本上检验一次更新，再决定要不要留下它。</mark></p>
+  </div>
+  <div class="note"><span class="en">The snake eating its tail is the whole paper in one picture.</span><span class="zh">咬住自己尾巴的蛇：整篇论文就是这一张图。</span></div>
+</div>
+<div class="cards">
+  <div class="card sketch"><div class="big o" data-count>+3.01</div><p class="en">nats worse at predicting real text after 128K tokens of self-writing (125M model)</p><p class="zh">125M 模型自我写入 128K token 后，预测真实文本的损失多出 3.01 nats</p></div>
+  <div class="card sketch"><div class="big b" data-count>98%</div><p class="en">of that damage disappears when a frozen copy does the writing instead</p><p class="zh">换成一个冻结的副本来写，这部分损害几乎全部消失</p></div>
+  <div class="card sketch"><div class="big g" data-count>.07</div><p class="en">nats left once Settlement checks each update on independent real text</p><p class="zh">用 Settlement 在独立真实文本上检验每次更新后，只剩下这么多 nats</p></div>
+</div>
+
+<!-- ============ 1 ============ -->
+<section class="chap" id="c1">
+  <div class="row">
+    <div>
+      <span class="chap-n"><span class="en">Chapter 1</span><span class="zh">第 1 章</span></span>
+      <h2 class="en">A model that learns while it reads</h2><h2 class="zh">一个边读边学的模型</h2>
+      <p class="en">Test-time training (TTT) lets part of a model, its <em>fast weights</em> W<sub>t</sub>, keep changing during inference. Information can then live in the weights after the text has scrolled out of the attention window. That is attractive for long documents and for agents that run for hours.</p>
+      <p class="zh">测试时训练（TTT）让模型的一部分参数，也就是<em>快权重</em> W<sub>t</sub>，在推理时继续更新。这样，文本即使已经滑出注意力窗口，信息仍能留在权重里。对长文档和长时间运行的智能体来说，这很有吸引力。</p>
+      <p class="en">Two words will carry the rest of the story.</p>
+      <p class="zh">接下来的故事里，有两个词会反复出现。</p>
+    </div>
+  </div>
+  <div class="rw">
+    <div class="sketch"><svg id="sk-read" viewBox="0 0 300 90" aria-hidden="true"></svg><h4><span class="en">Reading</span><span class="zh">读（reading）</span></h4><p class="en">The text sits in attention and shapes the next predictions. Nothing permanent changes.</p><p class="zh">文本留在注意力里，影响接下来的预测。没有任何东西被永久改变。</p></div>
+    <div class="sketch"><svg id="sk-write" viewBox="0 0 300 90" aria-hidden="true"></svg><h4><span class="en">Writing</span><span class="zh">写（writing）</span></h4><p class="en">The gradient update learned from the text is kept. The weights themselves change.</p><p class="zh">从这段文本学到的梯度更新被保留下来，权重本身变了。</p></div>
+  </div>
+  <div class="row">
+    <div>
+      <p class="en">Writing is not the villain. On real books, it helps:</p>
+      <p class="zh">写入本身不是坏人。在真实的书上，它是有帮助的：</p>
+      <figure>
+        <div class="fig-h"><span class="en">Keeping updates from real text improves prediction</span><span class="zh">保留真实文本的更新，预测会变好</span></div>
+        <div class="fig-s"><span class="en">benefit B = NLL without the update − NLL with it, in nats · higher is better</span><span class="zh">收益 B = 不更新时的 NLL − 更新后的 NLL（nats）· 越高越好</span></div>
+        <div class="chart" id="chBenefit"></div>
+        <figcaption class="en">On eleven teacher-forced books the input is fixed, so the .034-nat gain comes from learning itself. Qwen3-4B rows show the range of two adapted states.</figcaption>
+        <figcaption class="zh">在 11 本教师强制输入的书上，输入是固定的，所以 .034 nats 的收益只能来自学习本身。Qwen3-4B 两行显示的是两个适应状态的范围。</figcaption>
+      </figure>
+    </div>
+    <div class="note"><span class="en">Remember this. The same update rules that help here will fail in chapter 3.</span><span class="zh">记住这一点。同样的更新规则，到第 3 章就会失灵。</span></div>
+  </div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="chap" id="c2">
+  <div class="row">
+    <div>
+      <span class="chap-n"><span class="en">Chapter 2</span><span class="zh">第 2 章</span></span>
+      <h2 class="en">The model writes its own homework</h2><h2 class="zh">模型给自己出作业</h2>
+      <p class="en">Now let the model supply its own training data. The current weights W<sub>t</sub> write a 1024-token chunk x<sub>t</sub>. The model learns from x<sub>t</sub> and becomes W<sub>t+1</sub>. Then W<sub>t+1</sub> writes the next chunk. We call this the <mark>Closed Loop</mark>.</p>
+      <p class="zh">现在让模型自己提供训练数据。当前权重 W<sub>t</sub> 写出一段 1024 token 的文本 x<sub>t</sub>，模型从 x<sub>t</sub> 中学习，变成 W<sub>t+1</sub>；然后由 W<sub>t+1</sub> 写下一段。我们把它叫做<mark>闭环（Closed Loop）</mark>。</p>
+      <p class="en">To measure what the loop costs, we need a fair control. <em>Writes Off</em> reads exactly the same kind of generated text, keeping it in attention, but throws each update away.</p>
+      <p class="zh">要衡量这个闭环的代价，需要一个公平的对照组。<em>关闭写入（Writes Off）</em>读的是同样的生成文本，也把它们留在注意力里，但每次更新都直接丢掉。</p>
+    </div>
+    <div class="note"><span class="en">Lower loss on x<sub>t</sub> only shows the update fits x<sub>t</sub>. It says nothing about other text.</span><span class="zh">x<sub>t</sub> 上的损失变低，只说明这次更新拟合了 x<sub>t</sub>，不代表它对别的文本更好。</span></div>
+  </div>
+  <div class="grid2" style="margin-top:14px">
+    <div><div class="pair-label"><span class="en" style="font-weight:700;color:var(--ink);font-size:19px">Closed Loop</span><span class="zh" style="font-weight:700;color:var(--ink);font-size:19px">闭环</span> <span class="en">· the thing we study</span><span class="zh">· 研究对象</span></div><svg class="diagram" id="dgClosed" viewBox="0 0 640 390" role="img" aria-label="Closed Loop diagram"></svg></div>
+    <div><div class="pair-label"><span class="en" style="font-weight:700;color:var(--ink);font-size:19px">Writes Off</span><span class="zh" style="font-weight:700;color:var(--ink);font-size:19px">关闭写入</span> <span class="en">· the control</span><span class="zh">· 对照组</span></div><svg class="diagram" id="dgOff" viewBox="0 0 640 390" role="img" aria-label="Writes Off diagram"></svg></div>
+  </div>
+  <div class="row">
+    <div>
+      <div class="formula sketch">H = D<sub>closed</sub> − D<sub>off</sub><small class="en">D is the change in real-text NLL from the first to the last check. H &gt; 0 means keeping generated-text updates made things worse.</small><small class="zh">D 是真实文本 NLL 从第一次检查到最后一次检查的变化。H &gt; 0 表示保留生成文本的更新让结果变差。</small></div>
+      <p class="quiet en">Every check uses independent human-written passages from later, disjoint parts of the same PG-19 book. After each check, weights and attention are restored, so checking never changes the stream.</p>
+      <p class="quiet zh">每次检查都用独立的人类文本：来自同一本 PG-19 书中靠后、互不重叠的段落。每次检查完都会恢复权重和注意力状态，所以检查本身不会改变数据流。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="chap" id="c3">
+  <div class="row">
+    <div>
+      <span class="chap-n"><span class="en">Chapter 3</span><span class="zh">第 3 章</span></span>
+      <h2 class="en">Nothing happens. Then everything does.</h2><h2 class="zh">起初风平浪静，然后突然崩坏</h2>
+      <p class="en">We ran both policies for 128K tokens: an 8K real-text prefix, then 105 generated chunks. In the first few chunks the two look almost the same. Inside the 8K+8K window used by earlier evaluations, you would see nothing wrong. Only after many more self-writes does the Closed Loop pull away.</p>
+      <p class="zh">我们让两种策略各跑 128K token：先是 8K 的真实文本前缀，然后是 105 段生成文本。最初几段里，两者几乎一样。在以往评测采用的 8K+8K 窗口内，你看不出任何问题。只有经过更多次自我写入之后，闭环才开始明显偏离。</p>
+    </div>
+    <div class="note"><span class="en">A short benchmark would have called this method safe.</span><span class="zh">如果只跑一个短基准，这个方法会被判定为安全。</span></div>
+  </div>
+  <figure>
+    <div class="fig-h"><span class="en">Extra damage from keeping generated-text updates</span><span class="zh">保留生成文本更新带来的额外损害</span></div>
+    <div class="fig-s"><span class="en">H in nats, with 95% intervals over books · same six books, five seeds, 128K at every scale</span><span class="zh">H（nats），95% 区间按书重采样 · 每个规模都用同样 6 本书、5 个种子、128K</span></div>
+    <div class="chart" id="chScale"></div>
+    <figcaption class="en"><b>Every TTT-E2E interval excludes zero.</b> The size of the effect is not monotone in model size, so read this as the same direction replicated at three scales, not a scaling law. The bottom rows drop TTT entirely: plain Adam on Qwen3-4B's own feed-forward weights fails at learning rate 10<sup>−4</sup>, the same setting that gains .168 nats on real text.</figcaption>
+    <figcaption class="zh"><b>所有 TTT-E2E 的区间都不包含零。</b>效应大小并不随模型规模单调变化，所以应理解为同一方向在三个规模上复现，而不是缩放规律。最下面两行完全去掉了 TTT：直接用 Adam 更新 Qwen3-4B 自带的前馈层权重，学习率 10<sup>−4</sup> 时同样失败；而同一设置在真实文本上能带来 .168 nats 的收益。</figcaption>
+  </figure>
+  <div class="grid2">
+    <figure style="margin-top:0">
+      <div class="ctrl" style="justify-content:space-between;margin-top:0">
+        <div><div class="fig-h"><span class="en">Where each policy starts and ends</span><span class="zh">每种策略的起点和终点</span></div><div class="fig-s" style="margin:0"><span class="en">real-text NLL · lower is better</span><span class="zh">真实文本 NLL · 越低越好</span></div></div>
+        <div class="seg" role="group" aria-label="Model" id="endSeg"><button data-k="125M" aria-pressed="true">125M</button><button data-k="760M" aria-pressed="false">760M</button></div>
+      </div>
+      <div class="legend"><span><i style="background:var(--c-closed)"></i><span class="en">Closed Loop</span><span class="zh">闭环</span></span><span><i style="background:var(--c-fixed)"></i><span class="en">Fixed Generation</span><span class="zh">固定生成</span></span><span><i style="background:var(--c-off)"></i><span class="en">Writes Off</span><span class="zh">关闭写入</span></span></div>
+      <div class="chart" id="chEnd"></div>
+      <figcaption class="en">All three start from exactly the same loss. Only the endpoints are drawn; the full trajectory is the paper's Figure 1a. Fixed Generation shows up properly in chapter 4.</figcaption>
+      <figcaption class="zh">三者起点完全相同。这里只画了首尾两点，完整轨迹见论文图 1a。固定生成会在第 4 章正式登场。</figcaption>
+    </figure>
+    <div>
+      <p class="en" style="margin-top:6px">By the end, the Closed Loop's generated text is almost pure repetition: 99% of its 4-grams repeat (repeated-4 = .9902), against .0217 for Writes Off.</p>
+      <p class="zh" style="margin-top:6px">到最后，闭环生成的文本几乎全是重复：99% 的 4-gram 是重复的（repeated-4 = .9902），而关闭写入只有 .0217。</p>
+      <p class="en">Could a better decoder fix it? Not reliably. Full-support sampling halves the 128K gap to 1.452 nats, but its loss is still climbing at the end. Lower temperature, typical sampling and a repetition penalty change how fast things go wrong, not whether a given update is safe.</p>
+      <p class="zh">换个解码方式能解决吗？不太靠谱。全支撑采样把 128K 时的差距减半到 1.452 nats，但到最后损失仍在上升。降低温度、typical 采样、重复惩罚，改变的是坏得多快，而不是某一次更新是否安全。</p>
+      <p class="en">So what exactly is going wrong?</p>
+      <p class="zh">那么，到底是哪里出了问题？</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="chap" id="c4">
+  <div class="row">
+    <div>
+      <span class="chap-n"><span class="en">Chapter 4</span><span class="zh">第 4 章</span></span>
+      <h2 class="en">Three suspects</h2><h2 class="zh">三个嫌疑人</h2>
+      <p class="en">There are three plausible culprits. Maybe generated text is simply bad training data. Maybe degraded text hurts while it sits in attention. Maybe learning from it stores the harm in the weights. We question each one by cutting <em>one</em> link at a time.</p>
+      <p class="zh">有三个看起来都说得通的嫌疑人。也许生成文本本身就是糟糕的训练数据；也许退化的文本只要待在注意力里就会造成伤害；也许从中学习会把伤害存进权重。我们每次只切断<em>一条</em>链路，逐个审问。</p>
+    </div>
+  </div>
+
+  <div class="guess sketch" id="guess">
+    <div class="fig-h"><span class="en">Before we start: make a guess</span><span class="zh">开始之前，先猜一猜</span></div>
+    <p class="en">Suppose a frozen copy W<sub>0</sub> writes all the text, and the learner still learns from every chunk. How much of the +3.01 nats of damage goes away?</p>
+    <p class="zh">假设所有文本都由一个冻结的副本 W<sub>0</sub> 来写，学习者照样从每一段学习。+3.01 nats 的损害会消失多少？</p>
+    <div class="ctrl"><label for="guessRange"><span class="en">my guess</span><span class="zh">我猜</span></label><input type="range" id="guessRange" min="0" max="100" step="1" value="40"><span class="val" id="guessVal">40%</span>
+      <button class="btn" type="button" id="guessBtn"><span class="en">Reveal</span><span class="zh">揭晓</span></button></div>
+    <div class="chart" id="chGuess"></div>
+    <p class="msg" id="guessMsg"></p>
+  </div>
+
+  <div class="row"><div><p class="quiet"><span class="en">Now scroll through the investigation. The sketch follows along.</span><span class="zh">现在往下滚动，开始审问。草图会跟着变化。</span></p></div></div>
+
+  <div class="scrolly">
+    <div class="graphic">
+      <svg class="diagram" id="caseSvg" viewBox="0 0 640 390" role="img" aria-label="Investigation diagram"></svg>
+      <div class="tag" id="caseTag"></div>
+      <div class="case-dots" id="caseDots" aria-label="Steps"></div>
+    </div>
+    <div class="steps" id="steps">
+      <div class="step" data-mode="closed" tabindex="0"><div class="step-card sketch">
+        <div class="who"><span class="en">The scene</span><span class="zh">案发现场</span></div>
+        <h4 class="en">One model, writing and learning in a circle</h4><h4 class="zh">一个模型，在一个圈里边写边学</h4>
+        <p class="en">W<sub>t</sub> writes the chunk, learns from it, and the updated W<sub>t+1</sub> writes the next one.</p>
+        <p class="zh">W<sub>t</sub> 写出这一段，从中学习，更新后的 W<sub>t+1</sub> 再写下一段。</p>
+        <div class="res en">Damage after 128K tokens: <span class="n" style="color:var(--c-closed)">+3.01 nats</span> at 125M, +6.00 at 760M, +0.40 at 3B.</div>
+        <div class="res zh">128K token 后的损害：125M 上 <span class="n" style="color:var(--c-closed)">+3.01 nats</span>，760M 上 +6.00，3B 上 +0.40。</div>
+      </div></div>
+      <div class="step" data-mode="fixed" tabindex="0"><div class="step-card sketch">
+        <div class="who"><span class="en">Suspect 1</span><span class="zh">嫌疑人 1</span></div>
+        <h4 class="en">Is generated text just bad food?</h4><h4 class="zh">生成文本只是“垃圾食品”吗？</h4>
+        <p class="en">Let a frozen copy W<sub>0</sub> write every chunk. A separate learner still learns from every one of them. The learner still eats synthetic text; it just can no longer change what it will be fed next. This is <mark class="b">Fixed Generation</mark>.</p>
+        <p class="zh">让一个冻结的副本 W<sub>0</sub> 来写每一段，另一个独立的学习者照样从每一段学习。学习者吃的仍是合成文本，只是再也无法改变自己下一顿吃什么。这就是<mark class="b">固定生成（Fixed Generation）</mark>。</p>
+        <div class="res en">Damage left: <span class="n" style="color:var(--c-fixed)">.052 nats</span>. That removes 98.3% of the gap (98.8% at 760M).</div>
+        <div class="res zh">剩余损害：<span class="n" style="color:var(--c-fixed)">.052 nats</span>，消除了 98.3% 的差距（760M 上为 98.8%）。</div>
+        <span class="stamp b"><span class="en">Not enough on its own</span><span class="zh">单独不足以解释</span></span>
+      </div></div>
+      <div class="step" data-mode="replayA" tabindex="0"><div class="step-card sketch">
+        <div class="who"><span class="en">Suspect 2</span><span class="zh">嫌疑人 2</span></div>
+        <h4 class="en">Does reading degraded text hurt?</h4><h4 class="zh">读退化的文本会受伤吗？</h4>
+        <p class="en">Record a stream that has already degraded. Hand it to a fresh receiver trained on other books, and let it only read, with no updates.</p>
+        <p class="zh">把一段已经退化的生成流录下来，交给一个在其他书上训练过的全新接收者，只让它读，不做任何更新。</p>
+        <div class="res en">Reading alone adds <span class="n" style="color:var(--c-closed)">1.606 nats</span> while the text sits in attention.</div>
+        <div class="res zh">光是读，就在文本停留于注意力期间多出 <span class="n" style="color:var(--c-closed)">1.606 nats</span>。</div>
+        <span class="stamp"><span class="en">Hurts</span><span class="zh">有伤害</span></span>
+      </div></div>
+      <div class="step" data-mode="replayB" tabindex="0"><div class="step-card sketch">
+        <div class="who"><span class="en">Suspect 3</span><span class="zh">嫌疑人 3</span></div>
+        <h4 class="en">Does writing it down make it worse?</h4><h4 class="zh">把它写进权重会更糟吗？</h4>
+        <p class="en">Same receiver, same tokens, second pass. This time it keeps the updates. Because the text is identical, any extra harm was stored in the weights.</p>
+        <p class="zh">同一个接收者、同样的 token，第二遍这次保留更新。因为文本完全相同，多出来的伤害只能是存进了权重。</p>
+        <div class="res en">Total <span class="n">3.874 nats</span>: writing adds <span class="n" style="color:var(--c-closed)">2.268</span>. At 3B the same contrast is +.193 [.104, .327].</div>
+        <div class="res zh">总计 <span class="n">3.874 nats</span>：写入又多出 <span class="n" style="color:var(--c-closed)">2.268</span>。3B 上同样的对比为 +.193 [.104, .327]。</div>
+        <span class="stamp"><span class="en">Hurts more</span><span class="zh">伤害更大</span></span>
+      </div></div>
+      <div class="step" data-mode="verdict" tabindex="0"><div class="step-card sketch">
+        <div class="who"><span class="en">The verdict</span><span class="zh">结论</span></div>
+        <h4 class="en">The loop is what turns text bad</h4><h4 class="zh">是闭环把文本变坏的</h4>
+        <p class="en">Reading and writing degraded text both hurt. But the text only degrades because each update feeds back into the model's own future training data. Cut that link and almost nothing is left.</p>
+        <p class="zh">读和写退化文本都有伤害。但文本之所以会退化，是因为每次更新都会反馈进模型自己未来的训练数据。切断这条链路，几乎什么都不剩。</p>
+        <p class="en">It is not about how far the weights move, either. Fixed Generation moves them farther than Closed Loop (drift .0139 vs .0086) and does far less harm.</p>
+        <p class="zh">这也和权重移动了多远无关：固定生成比闭环移动得更远（漂移 .0139 对 .0086），伤害却小得多。</p>
+        <span class="stamp"><span class="en">Main cause: feedback</span><span class="zh">主因：反馈</span></span>
+      </div></div>
+    </div>
+  </div>
+
+  <h3><span class="en">The evidence, side by side</span><span class="zh">证据并排放</span></h3>
+  <div class="grid3">
+    <figure>
+      <div class="fig-h"><span class="en">Cut the feedback</span><span class="zh">切断反馈</span></div>
+      <div class="fig-s"><span class="en">damage over Writes Off at 128K, nats</span><span class="zh">128K 时相对关闭写入的损害（nats）</span></div>
+      <div class="chart" id="chFixed"></div>
+    </figure>
+    <figure>
+      <div class="fig-h"><span class="en">Same text, read vs. written</span><span class="zh">同样的文本：只读 vs 写入</span></div>
+      <div class="fig-s"><span class="en">NLL above the receiver's control, nats</span><span class="zh">相对接收者对照组多出的 NLL（nats）</span></div>
+      <div class="chart" id="chReplay"></div>
+    </figure>
+    <figure>
+      <div class="fig-h"><span class="en">Drift doesn't rank damage</span><span class="zh">漂移幅度解释不了损害</span></div>
+      <div class="fig-s"><span class="en">matched 125M control · 8 books, 5 seeds</span><span class="zh">匹配的 125M 对照 · 8 本书、5 个种子</span></div>
+      <div class="chart" id="chDrift"></div>
+    </figure>
+  </div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="chap" id="c5">
+  <div class="row">
+    <div>
+      <span class="chap-n"><span class="en">Chapter 5</span><span class="zh">第 5 章</span></span>
+      <h2 class="en">One update, two faces</h2><h2 class="zh">一次更新，两副面孔</h2>
+      <p class="en">The endpoints above mix thousands of updates. To see what a <em>single</em> update does, copy the model right before a generated chunk: same weights, same attention, same text. One copy keeps the update. The other throws it away. Any difference afterwards is caused by that one update.</p>
+      <p class="zh">上面的终点混合了成千上万次更新。要看清<em>单次</em>更新做了什么，就在生成一段文本之前把模型复制一份：同样的权重、同样的注意力、同样的文本。一份保留这次更新，另一份丢掉。之后的任何差异，都来自这一次更新。</p>
+    </div>
+    <div class="note"><span class="en">A better fit to its own words, a worse fit to ours.</span><span class="zh">对自己的话拟合得更好，对我们的话预测得更差。</span></div>
+  </div>
+  <figure>
+    <div class="legend"><span><i class="dot" style="background:var(--c-off)"></i><span class="en">after Writes Off history</span><span class="zh">关闭写入历史之后</span></span><span><i class="dot" style="background:var(--c-closed)"></i><span class="en">after Closed Loop history</span><span class="zh">闭环历史之后</span></span><span><i class="dot" style="background:var(--c-fixed)"></i><span class="en">after Fixed Generation history</span><span class="zh">固定生成历史之后</span></span></div>
+    <div class="grid2">
+      <div><div class="fig-h"><span class="en">Its own chunk: keep − discard</span><span class="zh">它自己那段：保留 − 丢弃</span></div><div class="fig-s"><span class="en">NLL change · left = fits its source better</span><span class="zh">NLL 变化 · 越靠左越拟合源文本</span></div><div class="chart" id="chSrc"></div></div>
+      <div><div class="fig-h"><span class="en">The next real passage: keep − discard</span><span class="zh">下一段真实文本：保留 − 丢弃</span></div><div class="fig-s"><span class="en">NLL change · right = hurts new text</span><span class="zh">NLL 变化 · 越靠右伤害越大</span></div><div class="chart" id="chNext"></div></div>
+    </div>
+    <figcaption class="en"><b>Every single row: better on its own chunk, worse on new real text.</b> After a Closed Loop history the gain on its own chunk shrinks to .0354 and the cost on real text grows to .0381. 125M, 95% book intervals.</figcaption>
+    <figcaption class="zh"><b>每一行都一样：在自己那段上更好，在新的真实文本上更差。</b>经历闭环历史之后，自身那段的收益缩小到 .0354，而真实文本上的代价增加到 .0381。125M，95% 按书区间。</figcaption>
+  </figure>
+  <div class="row">
+    <div>
+      <p class="en">The cost also grows as the loop runs. Early on, keeping one update costs .006 nats. Late in a Closed Loop it costs .113, while after Writes Off or Fixed Generation it stays near zero.</p>
+      <p class="zh">而且随着闭环运行，代价越来越大。早期保留一次更新代价 .006 nats；闭环后期变成 .113，而在关闭写入或固定生成的历史之后几乎为零。</p>
+      <figure>
+        <div class="fig-h"><span class="en">Cost of keeping one update, by when it happens</span><span class="zh">保留一次更新的代价，按发生的时间</span></div>
+        <div class="fig-s"><span class="en">next real-text NLL, keep − discard, nats · 125M</span><span class="zh">下一段真实文本 NLL，保留 − 丢弃（nats）· 125M</span></div>
+        <div class="legend"><span><i style="background:var(--c-closed)"></i><span class="en">Closed Loop history</span><span class="zh">闭环历史</span></span><span><i style="background:var(--c-off)"></i><span class="en">Writes Off history</span><span class="zh">关闭写入历史</span></span><span><i style="background:var(--c-fixed)"></i><span class="en">Fixed Generation history</span><span class="zh">固定生成历史</span></span></div>
+        <div class="chart" id="chPos"></div>
+      </figure>
+      <h3><span class="en">The gradients disagree</span><span class="zh">梯度在“打架”</span></h3>
+      <p class="en">Before keeping an update, compare the gradient from the generated chunk with the gradient from the next real passage. The more they point in opposite directions, the more the update hurts. Over 96 paired updates per setting, the rank correlations are strong and every interval excludes zero.</p>
+      <p class="zh">在保留一次更新之前，比较生成片段的梯度和下一段真实文本的梯度。方向越相反，这次更新伤害越大。每种设置 96 对更新，秩相关都很强，所有区间都不包含零。</p>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th><span class="en">Model / history</span><span class="zh">模型 / 历史</span></th><th class="r">ρ(cos, <span class="en">harm</span><span class="zh">伤害</span>)</th><th class="r">ρ(g<sup>⊤</sup>ΔW, <span class="en">harm</span><span class="zh">伤害</span>)</th><th class="r"><span class="en">mean cos</span><span class="zh">平均 cos</span></th></tr></thead>
+          <tbody>
+            <tr><td><span class="dotk" style="background:var(--c-closed)"></span>125M · <span class="en">Closed Loop</span><span class="zh">闭环</span></td><td class="r">−.502</td><td class="r">.704</td><td class="r">−.093</td></tr>
+            <tr><td><span class="dotk" style="background:var(--c-off)"></span>125M · <span class="en">Writes Off</span><span class="zh">关闭写入</span></td><td class="r">−.788</td><td class="r">.794</td><td class="r">−.005</td></tr>
+            <tr><td><span class="dotk" style="background:var(--c-closed)"></span>760M · <span class="en">Closed Loop</span><span class="zh">闭环</span></td><td class="r">−.633</td><td class="r">.632</td><td class="r">−.103</td></tr>
+            <tr><td><span class="dotk" style="background:var(--c-off)"></span>760M · <span class="en">Writes Off</span><span class="zh">关闭写入</span></td><td class="r">−.731</td><td class="r">.751</td><td class="r">−.004</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="quiet en">After a Closed Loop history, generated and real gradients actively oppose each other (mean cos ≈ −.10); after Writes Off they are nearly orthogonal. This explains which updates hurt, but it is not a usable filter, since it peeks at the very passage on which harm is measured.</p>
+      <p class="quiet zh">经历闭环历史后，生成文本与真实文本的梯度明显相反（平均 cos ≈ −.10）；关闭写入之后则几乎正交。这解释了哪些更新有害，但不能直接当过滤器用，因为它偷看了用来衡量伤害的那段文本。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6 ============ -->
+<section class="chap" id="c6">
+  <div class="row">
+    <div>
+      <span class="chap-n"><span class="en">Chapter 6</span><span class="zh">第 6 章</span></span>
+      <h2 class="en">Most late updates are fine. A few are terrible.</h2><h2 class="zh">大多数后期更新没事，少数是灾难</h2>
+      <p class="en">If late updates get more expensive on average, are they all bad? We replayed eight-chunk passages into identical receivers, once read-only and once read-and-write, 72 pairs at each position.</p>
+      <p class="zh">如果后期更新平均越来越贵，是不是每一个都坏？我们把 8 段长的片段回放给完全相同的接收者，一次只读、一次读并写，每个位置 72 对。</p>
+    </div>
+    <div class="note"><span class="en">The mean rises; the median doesn't. A handful of runs carry the whole average.</span><span class="zh">均值在涨，中位数不动。整个平均值是少数几条轨迹撑起来的。</span></div>
+  </div>
+  <div class="grid2">
+    <figure>
+      <div class="fig-h"><span class="en">Typical vs. average write cost</span><span class="zh">典型 vs 平均写入代价</span></div>
+      <div class="fig-s">NLL(<span class="en">read + write</span><span class="zh">读+写</span>) − NLL(<span class="en">read only</span><span class="zh">只读</span>), nats</div>
+      <div class="legend"><span><i style="background:var(--ink)"></i><span class="en">mean</span><span class="zh">均值</span></span><span><i style="background:var(--c-off)"></i><span class="en">median</span><span class="zh">中位数</span></span></div>
+      <div class="chart" id="chTail"></div>
+    </figure>
+    <figure>
+      <div class="fig-h"><span class="en">Disasters: costs above 0.5 nats</span><span class="zh">灾难：代价超过 0.5 nats</span></div>
+      <div class="fig-s"><span class="en">count out of 72 paired comparisons</span><span class="zh">72 对比较中的个数</span></div>
+      <div class="legend" style="visibility:hidden"><span><i></i>.</span></div>
+      <div class="chart" id="chCount"></div>
+    </figure>
+  </div>
+  <div class="row">
+    <div>
+      <p class="en">At the last position the mean is <span class="n">.7512</span> but the median is <span class="n">.0064</span>. All twelve disasters come from <mark>4 of 24</mark> source sequences, and once a pair crosses the line it stays above it. So "late in the stream" is a warning sign, not a rule for which update to drop.</p>
+      <p class="zh">在最后一个位置，均值是 <span class="n">.7512</span>，中位数却只有 <span class="n">.0064</span>。全部 12 次灾难来自 24 条源序列中的 <mark>4 条</mark>，而且一旦某对越过阈值，之后就一直在阈值之上。所以“处在数据流后期”只是警示信号，不能用来决定该丢哪次更新。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 7 ============ -->
+<section class="chap" id="c7">
+  <div class="row">
+    <div>
+      <span class="chap-n"><span class="en">Chapter 7</span><span class="zh">第 7 章</span></span>
+      <h2 class="en">Half-fixes</h2><h2 class="zh">治标不治本</h2>
+      <p class="en">Before building something new, we tried the obvious remedies. Each one helps. None of them can tell you whether a <em>particular</em> update is safe to keep.</p>
+      <p class="zh">在设计新方法之前，我们先试了显而易见的补救办法。每一个都有点用，但没有一个能告诉你<em>某一次</em>更新是否值得保留。</p>
+      <h3><span class="en">Remedy 1 · Interrupt the loop with real text</span><span class="zh">补救 1 · 用真实文本打断闭环</span></h3>
+      <p class="en">Swap some of the 105 generated chunks for real ones, still keeping every update. Try the schedules below and watch the longest stretch the model spends writing to itself.</p>
+      <p class="zh">把 105 段生成文本中的一部分换成真实文本，同时仍保留每一次更新。试试下面几种安排，观察模型连续“自说自话”的最长一段。</p>
+    </div>
+  </div>
+  <figure>
+    <div class="ctrl">
+      <div class="seg" role="group" aria-label="Real-text schedule" id="expSeg">
+        <button data-k="0" aria-pressed="false"><span class="en">0% real</span><span class="zh">0% 真实</span></button>
+        <button data-k="5" aria-pressed="false">5%</button>
+        <button data-k="10" aria-pressed="false">10%</button>
+        <button data-k="20" aria-pressed="false">20%</button>
+        <button data-k="31e" aria-pressed="true"><span class="en">31% spread out</span><span class="zh">31% 均匀分布</span></button>
+        <button data-k="31b" aria-pressed="false"><span class="en">31% in bursts</span><span class="zh">31% 成团出现</span></button>
+      </div>
+      <button class="tool" type="button" id="expPlay">▶ <span class="en">play all</span><span class="zh">依次播放</span></button>
+    </div>
+    <div class="fig-s" id="expTitle"></div>
+    <div class="strip" id="strip" aria-hidden="true"></div>
+    <div class="strip-key"><span><i style="background:var(--ink);border-color:var(--ink)"></i><span class="en">real chunk</span><span class="zh">真实文本段</span></span><span><i style="background:repeating-linear-gradient(-45deg,var(--hl-closed) 0 1.5px,transparent 1.5px 4px)"></i><span class="en">self-written chunk</span><span class="zh">自写段</span></span><span><i style="background:var(--c-closed)"></i><span class="en">longest self-written stretch</span><span class="zh">最长连续自写</span></span></div>
+    <div class="readout">
+      <div><div class="k"><span class="en">longest self-written stretch</span><span class="zh">最长连续自写</span></div><div class="v" id="roBurst">3</div><div class="s"><span class="en">chunks in a row</span><span class="zh">段连续</span></div></div>
+      <div><div class="k"><span class="en">damage H</span><span class="zh">损害 H</span></div><div class="v" id="roH">.0694</div><div class="s" id="roHci"></div></div>
+      <div><div class="k"><span class="en">vs. no real text</span><span class="zh">相对没有真实文本</span></div><div class="v" id="roRel">6%</div><div class="s" id="roB"></div></div>
+    </div>
+    <div class="chart" id="chExp" style="margin-top:12px"></div>
+    <figcaption class="en"><b>Spacing matters as much as amount.</b> At 31%, real text spread out leaves 6% of the damage; the same 33 chunks in bursts leave about 60%. Separate eight-book long-stream suite, 125M, five seeds.</figcaption>
+    <figcaption class="zh"><b>分布方式和数量一样重要。</b>31% 时，均匀分布的真实文本只留下 6% 的损害；同样 33 段成团出现，则留下约 60%。独立的 8 本长书实验，125M，5 个种子。</figcaption>
+  </figure>
+
+  <div class="row"><div><h3><span class="en">Remedies 2–4 · Write less, decode differently, down-weight repeats</span><span class="zh">补救 2–4 · 写得更少、换解码方式、给重复降权</span></h3></div></div>
+  <figure>
+    <div class="ctrl">
+      <div class="seg" role="group" aria-label="Remedy" id="repSeg">
+        <button data-k="dose" aria-pressed="true"><span class="en">Smaller writes</span><span class="zh">更小的写入</span></button>
+        <button data-k="decode" aria-pressed="false"><span class="en">Decoding &amp; resets</span><span class="zh">解码与重置</span></button>
+        <button data-k="rep" aria-pressed="false"><span class="en">Repetition weighting</span><span class="zh">重复加权</span></button>
+      </div>
+    </div>
+    <div id="rep-dose">
+      <div class="ctrl"><label for="doseRange"><span class="en">write strength α</span><span class="zh">写入强度 α</span></label><input type="range" id="doseRange" min="0" max="6" step="1" value="5"><span class="val" id="doseVal">α = 1</span></div>
+      <div class="chart" id="chDose"></div>
+      <p class="quiet" id="doseNote" style="margin-top:8px"></p>
+    </div>
+    <div id="rep-decode" hidden>
+      <div class="grid2">
+        <div><div class="fig-h"><span class="en">Gap to Writes Off at 128K</span><span class="zh">128K 时与关闭写入的差距</span></div><div class="fig-s"><span class="en">nats · lower is better</span><span class="zh">nats · 越低越好</span></div><div class="chart" id="chDecE"></div></div>
+        <div><div class="fig-h"><span class="en">Still getting worse at the end?</span><span class="zh">最后还在变差吗？</span></div><div class="fig-s"><span class="en">late slope, nats per check</span><span class="zh">后期斜率，每次检查的 nats</span></div><div class="chart" id="chDecS"></div></div>
+      </div>
+      <p class="quiet en" style="margin-top:8px">Full-support sampling halves the gap but has the steepest late slope: it delays the failure. Resetting every 8 chunks nearly stops it, but also throws away 56% of the useful real-text learning.</p>
+      <p class="quiet zh" style="margin-top:8px">全支撑采样把差距减半，但后期斜率最陡：它只是推迟了失败。每 8 段重置一次几乎止住了损害，但也丢掉了 56% 有用的真实文本学习。</p>
+    </div>
+    <div id="rep-rep" hidden>
+      <div class="fig-s"><span class="en">gap to Writes Off at 128K, nats, 95% interval · sixteen books, five seeds</span><span class="zh">128K 时与关闭写入的差距（nats），95% 区间 · 16 本书、5 个种子</span></div>
+      <div class="chart" id="chRep"></div>
+      <p class="quiet en" style="margin-top:8px">Down-weighting repeated tokens beats lowering the update weight at random by .49 nats, but still leaves 1.56. Repetition is a symptom, not a verdict.</p>
+      <p class="quiet zh" style="margin-top:8px">给重复 token 降权比随机降低更新权重好 .49 nats，但仍留下 1.56。重复只是症状，不是判决依据。</p>
+    </div>
+  </figure>
+</section>
+
+<!-- ============ 8 ============ -->
+<section class="chap" id="c8">
+  <div class="row">
+    <div>
+      <span class="chap-n"><span class="en">Chapter 8</span><span class="zh">第 8 章</span></span>
+      <h2 class="en">Ask before you remember</h2><h2 class="zh">先问一句，再记下来</h2>
+      <p class="en">Every half-fix shares one blind spot: none asks whether the update actually helps beyond its own chunk. So ask directly. Keep each update <em>pending</em>. When independent real text q arrives, compare the current state with the candidate state on it. Keep the update only if the candidate predicts q at least as well. We call this <mark class="g">Settlement</mark>.</p>
+      <p class="zh">所有半吊子方案都有同一个盲点：没有一个去问，这次更新在它自己那段之外是否真的有帮助。那就直接问。让每次更新先<em>挂起</em>，等独立的真实文本 q 到来时，在 q 上比较当前状态和候选状态，只有候选状态预测 q 至少一样好，才保留这次更新。我们把它叫做 <mark class="g">Settlement（先验证，再提交）</mark>。</p>
+    </div>
+    <div class="note"><span class="en">The gate never looks at where the text came from. It only looks at what the update does.</span><span class="zh">这道关卡从不看文本是从哪来的，只看这次更新做了什么。</span></div>
+  </div>
+  <div class="grid2" style="align-items:center">
+    <svg class="diagram" id="dgSettle" viewBox="0 0 640 390" role="img" aria-label="Settlement diagram"></svg>
+    <div>
+      <div class="formula sketch" style="margin-top:0">A(δ; W, q) = L(q; W) − L(q; W + δ)<small class="en">commit δ only if A ≥ 0</small><small class="zh">只有 A ≥ 0 时才提交 δ</small></div>
+      <pre class="algo sketch en" aria-label="Algorithm 1"><span class="c"># Algorithm 1, condensed</span>
+q ← newest real text (or the retained bank)
+S ← W
+<span class="k">for</span> δ <span class="k">in</span> pending, in order:
+    <span class="k">if</span> NLL(q; S + δ) ≤ NLL(q; S):
+        S ← S + δ    <span class="c"># judge the next δ on top</span>
+commit W ← S</pre>
+      <pre class="algo sketch zh" aria-label="算法 1"><span class="c"># 算法 1（精简版）</span>
+q ← 最新的真实文本（或保留的文本库）
+S ← W
+<span class="k">for</span> δ <span class="k">in</span> 待定更新，按提出顺序:
+    <span class="k">if</span> NLL(q; S + δ) ≤ NLL(q; S):
+        S ← S + δ    <span class="c"># 下一个 δ 在此基础上评判</span>
+提交 W ← S</pre>
+    </div>
+  </div>
+
+  <figure>
+    <div class="fig-h"><span class="en">The result</span><span class="zh">结果</span></div>
+    <div class="fig-s"><span class="en">gap to Writes Off at the end of the stream, nats, 95% interval</span><span class="zh">数据流末端与关闭写入的差距（nats），95% 区间</span></div>
+    <div class="legend"><span><i class="dot" style="background:var(--c-closed)"></i><span class="en">Closed Loop</span><span class="zh">闭环</span></span><span><i class="dot" style="background:var(--c-settle)"></i>Settlement</span></div>
+    <div class="chart" id="chSettle"></div>
+    <figcaption class="en"><b>Almost all the damage is gone.</b> Settlement keeps only 22 of 936 generated-text updates at 125M and 18 of 312 at 760M. Both leftover intervals include zero; that is not a claim of equivalence. It beats Closed Loop on 11 of 12 books at 125M and on all four at 760M.</figcaption>
+    <figcaption class="zh"><b>损害几乎全部消失。</b>Settlement 在 125M 上只保留了 936 次生成文本更新中的 22 次，在 760M 上保留了 312 次中的 18 次。两个剩余区间都包含零，但这不等于声称两者等价。它在 125M 的 12 本书中有 11 本优于闭环，在 760M 的 4 本书上全部优于闭环。</figcaption>
+  </figure>
+
+  <div class="row">
+    <div>
+      <h3><span class="en">Check the state you will actually keep</span><span class="zh">检验你真正要保留的那个状态</span></h3>
+      <p class="en">One subtlety. Updates that each look safe alone can be harmful together. So every candidate is judged on top of the ones already accepted, never against the original weights.</p>
+      <p class="zh">还有一个细节：单独看都安全的更新，合在一起可能有害。所以每个候选都在已接受的更新之上评判，而不是对着原始权重。</p>
+    </div>
+  </div>
+  <div class="modes" id="modes"></div>
+  <p class="quiet en" style="margin-top:12px">H: harm on generated streams (lower is better). B: benefit on eleven real-text books vs. no updates (higher is better). H and B come from separate streams.</p>
+  <p class="quiet zh" style="margin-top:12px">H：生成文本流上的伤害（越低越好）。B：在 11 本真实文本书上相对不更新的收益（越高越好）。H 和 B 来自不同的数据流。</p>
+
+  <div class="grid2">
+    <figure>
+      <div class="fig-h"><span class="en">The check does the work, not smaller steps</span><span class="zh">起作用的是检验，不是更小的步子</span></div>
+      <div class="fig-s"><span class="en">final NLL above Writes Off, nats · 125M, four books, three seeds</span><span class="zh">相对关闭写入的最终 NLL 增量（nats）· 125M，4 本书、3 个种子</span></div>
+      <div class="legend"><span><i class="dot" style="background:var(--c-closed)"></i><span class="en">without the check</span><span class="zh">不检验</span></span><span><i class="dot" style="background:var(--c-settle)"></i><span class="en">with Settlement</span><span class="zh">加上 Settlement</span></span></div>
+      <div class="chart" id="chAbl"></div>
+    </figure>
+    <figure>
+      <div class="fig-h"><span class="en">And it still learns from real text</span><span class="zh">它仍然能从真实文本中学习</span></div>
+      <div class="fig-s"><span class="en">improvement vs. rejecting every update, nats · all-real stream</span><span class="zh">相对拒绝全部更新的改进（nats）· 纯真实文本流</span></div>
+      <div class="chart" id="chAllReal"></div>
+      <figcaption class="en">On an all-real stream, Settlement admits 89 of 113 updates and edges out writing everything (+.0083 [.0020, .0161]). It rejects generated updates because they fail the check, not because it rejects everything.</figcaption>
+      <figcaption class="zh">在纯真实文本流上，Settlement 接受了 113 次更新中的 89 次，还略胜于全部写入（+.0083 [.0020, .0161]）。它拒绝生成文本的更新，是因为这些更新没通过检验，而不是因为它什么都拒绝。</figcaption>
+    </figure>
+  </div>
+
+  <div class="row">
+    <div>
+      <h3><span class="en">What if you just labeled the text?</span><span class="zh">如果只是给文本打上标签呢？</span></h3>
+      <p class="en">A simpler rule, <em>Source Masking</em>, keeps updates from text labeled "real" and drops those labeled "generated". With perfect labels it is simpler and slightly better. Now corrupt the labels and drag the slider.</p>
+      <p class="zh">一个更简单的规则叫<em>来源屏蔽（Source Masking）</em>：保留标为“真实”的文本带来的更新，丢掉标为“生成”的。标签完全正确时，它更简单，也略好一点。现在把一部分标签弄错，拖动滑块看看。</p>
+    </div>
+  </div>
+  <figure>
+    <div class="ctrl"><label for="labRange"><span class="en">labels that are wrong</span><span class="zh">标错的比例</span></label><input type="range" id="labRange" min="0" max="7" step="1" value="4"><span class="val" id="labVal">38.9%</span></div>
+    <div class="legend"><span><i style="background:var(--c-off)"></i><span class="en">Source Masking</span><span class="zh">来源屏蔽</span></span><span><i style="background:var(--c-settle)"></i>Settlement</span></div>
+    <div class="chart" id="chLab"></div>
+    <div class="readout">
+      <div><div class="k"><span class="en">generated updates Masking wrongly keeps</span><span class="zh">屏蔽错误保留的生成更新</span></div><div class="v" id="lbG">26</div></div>
+      <div><div class="k"><span class="en">real updates Masking wrongly drops</span><span class="zh">屏蔽错误丢弃的真实更新</span></div><div class="v" id="lbR">18</div></div>
+      <div><div class="k"><span class="en">Settlement − Masking</span><span class="zh">Settlement − 屏蔽</span></div><div class="v" id="lbD">−.0369</div><div class="s" id="lbS"></div></div>
+    </div>
+    <figcaption class="en"><b>Settlement barely notices.</b> It stays between 3.8196 and 3.8286 at every error rate. Even with every label wrong, it admits 120 of 120 truly real updates and 0 of 219 self-generated ones. 125M mixed stream, three seeds; lower is better.</figcaption>
+    <figcaption class="zh"><b>Settlement 几乎不受影响。</b>在所有错误率下，它都保持在 3.8196 到 3.8286 之间。即便标签全错，它也接受了全部 120 次真正来自真实文本的更新，而 219 次自我生成的更新一次也没接受。125M 混合数据流，3 个种子；越低越好。</figcaption>
+  </figure>
+</section>
+
+<!-- ============ 9 ============ -->
+<section class="chap" id="c9">
+  <div class="row">
+    <div>
+      <span class="chap-n"><span class="en">Chapter 9</span><span class="zh">第 9 章</span></span>
+      <h2 class="en">Out in the world: agents</h2><h2 class="zh">走进真实世界：智能体</h2>
+      <p class="en">Agents that learn from their own actions face the same loop, with a twist: every update carries the same "generated" label. A label rule can only keep them all (Closed Loop) or drop them all (Writes Off). A task score can tell them apart.</p>
+      <p class="zh">从自己的行动中学习的智能体，面对的是同一个闭环，还多一个麻烦：每次更新都带着同一个“生成”标签。基于标签的规则只能全部保留（闭环），或全部丢弃（关闭写入）。任务得分则能把它们区分开。</p>
+    </div>
+  </div>
+  <div class="grid2">
+    <figure>
+      <div class="fig-h"><span class="en">WebShop · exact success</span><span class="zh">WebShop · 完全成功率</span></div>
+      <div class="fig-s"><span class="en">Qwen3-4B with LoRA · mean ± SD, five paired seeds</span><span class="zh">Qwen3-4B + LoRA · 均值 ± 标准差，5 个配对种子</span></div>
+      <div class="chart" id="chWeb"></div>
+      <figcaption class="en">Settlement checks validation reward every 25 episodes and keeps 10 of 180 blocks. Fixed Generation and Settlement each beat Closed Loop on every paired seed.</figcaption>
+      <figcaption class="zh">Settlement 每 25 个回合检查一次验证奖励，在 180 个更新块中只保留 10 个。固定生成和 Settlement 在每个配对种子上都胜过闭环。</figcaption>
+    </figure>
+    <figure>
+      <div class="ctrl" style="justify-content:space-between;margin-top:0">
+        <div><div class="fig-h"><span class="en">ALFWorld · unseen household tasks</span><span class="zh">ALFWorld · 未见过的家务任务</span></div><div class="fig-s" style="margin:0"><span class="en">Qwen3.8-27B with LoRA · % solved, mean ± SD, 3 seeds</span><span class="zh">Qwen3.8-27B + LoRA · 成功率 %，均值 ± 标准差，3 个种子</span></div></div>
+        <div class="seg" role="group" aria-label="Update scale" id="alfSeg"><button data-k="8" aria-pressed="true"><span class="en">scale 8</span><span class="zh">规模 8</span></button><button data-k="16" aria-pressed="false"><span class="en">scale 16</span><span class="zh">规模 16</span></button></div>
+      </div>
+      <div class="chart" id="chAlf"></div>
+      <figcaption class="en">Two of three Closed Loop seeds solve none of the 134 unseen tasks. Settlement solves 88–94% per seed while keeping 19–33% of update blocks. Three seeds are not enough to claim a gain over Writes Off.</figcaption>
+      <figcaption class="zh">闭环的 3 个种子里，有 2 个在 134 个未见任务上一个都没完成。Settlement 每个种子完成 88–94%，同时保留 19–33% 的更新块。3 个种子还不足以宣称它优于关闭写入。</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ============ EPILOGUE ============ -->
+<section class="chap" id="epilogue">
+  <div class="row">
+    <div>
+      <span class="chap-n"><span class="en">Epilogue</span><span class="zh">尾声</span></span>
+      <h2 class="en">What we learned</h2><h2 class="zh">我们学到了什么</h2>
+      <ol class="lessons">
+        <li class="sketch"><span class="num">1</span><span class="en"><b>The loop is the problem, not the text.</b> A learner that eats synthetic text from a frozen writer stays close to Writes Off. Damage grows when the learner also writes its own future lessons.</span><span class="zh"><b>问题出在闭环，而不是文本。</b>学习者从冻结的写手那里吃合成文本，表现仍接近关闭写入。只有当学习者也在给自己写未来的课本时，损害才会增长。</span></li>
+        <li class="sketch"><span class="num">2</span><span class="en"><b>Damage is concentrated.</b> Four of 24 source sequences produce every disaster above 0.5 nats. The loop makes some trajectories persistently harmful, not every late update.</span><span class="zh"><b>损害高度集中。</b>24 条源序列中的 4 条造成了所有超过 0.5 nats 的灾难。闭环让某些轨迹持续有害，而不是让每次后期更新都有害。</span></li>
+        <li class="sketch"><span class="num">3</span><span class="en"><b>Fitting its own chunk proves nothing.</b> Neither source fit nor repetition tells you whether an update helps on new text. Real text helps most when it interrupts often.</span><span class="zh"><b>拟合好自己那段，什么也证明不了。</b>源文本拟合度和重复度都无法说明一次更新在新文本上是否有用。真实文本最有效的用法，是频繁地打断自我写入。</span></li>
+        <li class="sketch"><span class="num">4</span><span class="en"><b>Check on independent evidence, then commit.</b> Settlement nearly matches Writes Off on generated streams, keeps useful real-text learning, and survives broken labels.</span><span class="zh"><b>先用独立证据检验，再提交。</b>Settlement 在生成文本流上几乎追平关闭写入，保留了有用的真实文本学习，并且在标签出错时依然稳健。</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="chap" id="cite">
+  <div class="row">
+    <div>
+      <span class="chap-n"><span class="en">Cite</span><span class="zh">引用</span></span>
+      <h2>BibTeX</h2>
+      <div class="bib">
+        <pre class="sketch" id="bibtex">@article{luo2026selfgenerated,
+  title   = {Self-Generated Feedback Destabilizes Test-Time Training:
+             A Causal Decomposition of Long-Horizon Adaptation},
+  author  = {Luo, Cheng and Li, Bing and Ghanem, Bernard},
+  journal = {arXiv preprint arXiv:2610.05076},
+  year    = {2026}
+}</pre>
+        <button class="btn" id="copyBib" type="button"><span class="en">Copy</span><span class="zh">复制</span></button>
+      </div>
+    </div>
+  </div>
+  <footer><span class="en">Code and experiment manifests:</span><span class="zh">代码与实验清单：</span> <a href="https://github.com/lingjivoo/ttt-ouroboros" target="_blank" rel="noopener">github.com/lingjivoo/ttt-ouroboros</a>. <span class="en">Every chart here is redrawn by hand from the numbers in the paper's tables.</span><span class="zh">本页所有图表都根据论文表格中的数字手绘重画。</span></footer>
+</section>
+
+</div>
+<button class="fab off" id="fab" type="button" aria-label="Back to top">↑</button>
+<div id="tip" hidden></div>
+
+<script>
+(function () {
+  "use strict";
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const NS = "http://www.w3.org/2000/svg";
+  const root = document.documentElement;
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const lin = (d, r) => v => r[0] + (v - d[0]) / (d[1] - d[0]) * (r[1] - r[0]);
+  const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+  const f = (v, d = 3) => { let s = Math.abs(v).toFixed(d); if (s.startsWith("0.")) s = s.slice(1); return (v < 0 && +s !== 0 ? "−" : "") + s; };
+  const fs = (v, d = 3) => (v > 0 ? "+" : "") + f(v, d);
+  const W = el => Math.max(260, Math.floor(el.clientWidth || 600));
+  const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+  function niceTicks(a, b, n = 5) {
+    const st0 = (b - a) / n, mag = Math.pow(10, Math.floor(Math.log10(st0))), e = st0 / mag;
+    const st = mag * (e >= 7.5 ? 10 : e >= 3.5 ? 5 : e >= 1.5 ? 2 : 1), out = [];
+    for (let v = Math.ceil(a / st) * st; v <= b + st * 1e-9; v += st) out.push(+v.toFixed(10));
+    return out;
+  }
+  const tickFmt = v => v === 0 ? "0" : String(+v.toFixed(4)).replace(/^(-?)0\./, "$1.").replace("-", "−");
+
+  /* ---------- language ---------- */
+  let LANG = "en";
+  const t = (en, zh) => LANG === "zh" ? zh : en;
+
+  /* rough.js, with a plain-SVG stand-in if the CDN is unreachable */
+  const R = window.rough || {
+    svg() {
+      const mk = (tag, a, o) => { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); e.setAttribute("stroke", o.stroke || "none"); e.setAttribute("stroke-width", o.strokeWidth || 1); e.setAttribute("fill", o.fill && o.fillStyle ? o.fill : "none"); if (o.fill && o.fillStyle === "hachure") e.setAttribute("fill-opacity", ".35"); if (o.strokeLineDash) e.setAttribute("stroke-dasharray", o.strokeLineDash.join(" ")); return e; };
+      return {
+        line: (x1, y1, x2, y2, o) => mk("line", { x1, y1, x2, y2 }, o),
+        rectangle: (x, y, w, h, o) => mk("rect", { x, y, width: w, height: h }, o),
+        circle: (cx, cy, d, o) => mk("circle", { cx, cy, r: d / 2 }, o),
+        ellipse: (cx, cy, w, h, o) => mk("ellipse", { cx, cy, rx: w / 2, ry: h / 2 }, o),
+        linearPath: (p, o) => mk("polyline", { points: p.map(q => q.join(",")).join(" ") }, o),
+        polygon: (p, o) => mk("polygon", { points: p.map(q => q.join(",")).join(" ") }, o),
+        path: (d, o) => mk("path", { d }, o)
+      };
+    }
+  };
+
+  let P = {};
+  function readPal() {
+    const cs = getComputedStyle(root), g = n => cs.getPropertyValue(n).trim();
+    P = { ink: g("--ink"), pencil: g("--pencil"), faint: g("--faint"), rule: g("--rule"), paper: g("--paper"), card: g("--card"),
+      hlc: g("--hl-closed"), closed: g("--c-closed"), fixed: g("--c-fixed"), settle: g("--c-settle"), off: g("--c-off") };
+  }
+  const col = k => P[k] || k;
+
+  /* ---------- tooltip (mouse + touch) ---------- */
+  const tip = $("#tip");
+  function moveTip(e) {
+    const r = tip.getBoundingClientRect(); let x = e.clientX + 14, y = e.clientY + 14;
+    if (x + r.width > innerWidth - 8) x = e.clientX - r.width - 14;
+    if (y + r.height > innerHeight - 8) y = e.clientY - r.height - 14;
+    tip.style.left = Math.max(8, x) + "px"; tip.style.top = Math.max(8, y) + "px";
+  }
+  document.addEventListener("pointerover", e => { const el = e.target.closest && e.target.closest("[data-tip]"); if (el) { tip.innerHTML = el.getAttribute("data-tip"); tip.hidden = false; moveTip(e); } });
+  document.addEventListener("pointermove", e => { if (!tip.hidden && e.pointerType === "mouse") moveTip(e); });
+  document.addEventListener("pointerout", e => { if (e.pointerType !== "mouse") return; const el = e.target.closest && e.target.closest("[data-tip]"); if (el && !(e.relatedTarget && el.contains(e.relatedTarget))) tip.hidden = true; });
+  document.addEventListener("pointerdown", e => { if (!(e.target.closest && e.target.closest("[data-tip]"))) tip.hidden = true; });
+
+  /* ---------- pencil draw-on when a chart scrolls into view ---------- */
+  const seen = new WeakSet();
+  const drawIO = ("IntersectionObserver" in window && !reduce) ? new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting) return; drawIO.unobserve(e.target); seen.add(e.target); playDraw(e.target);
+  }), { rootMargin: "0px 0px -12% 0px" }) : null;
+  function hidePaths(el) { $$(".rg path", el).forEach(p => { const L = p.getTotalLength(); p.style.transition = "none"; p.style.strokeDasharray = L; p.style.strokeDashoffset = L; }); }
+  function playDraw(el) {
+    const ps = $$(".rg path", el); el.getBoundingClientRect();
+    requestAnimationFrame(() => ps.forEach((p, i) => { p.style.transition = `stroke-dashoffset .9s ease-out ${Math.min(i * 5, 450)}ms`; p.style.strokeDashoffset = 0; }));
+  }
+  function armDraw(el) {
+    if (!drawIO || seen.has(el)) return;
+    const r = el.getBoundingClientRect();
+    if (r.top < innerHeight && r.bottom > 0) { seen.add(el); return; }
+    hidePaths(el); drawIO.observe(el);
+  }
+
+  /* ---------- chart canvas ---------- */
+  function base(el, h, aria) {
+    const w = W(el);
+    el.innerHTML = `<svg class="viz" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(aria || "")}"><g class="gl"></g><g class="rg"></g><g class="tx"></g><g class="ht"></g></svg>`;
+    const svg = el.firstElementChild, rc = R.svg(svg), rg = svg.querySelector(".rg");
+    let seed = 17;
+    const o = x => Object.assign({ roughness: .85, bowing: .6, strokeWidth: 1.4, seed: seed++ }, x || {});
+    const c = {
+      w, h, svg, gl: [], tx: [], ht: [],
+      add(n) { rg.appendChild(n); return n; },
+      line(x1, y1, x2, y2, stroke, sw, extra) { return c.add(rc.line(x1, y1, x2, y2, o(Object.assign({ stroke, strokeWidth: sw || 1.4 }, extra)))); },
+      rect(x, y, ww, hh, color, extra) {
+        const solid = ww < 9 || hh < 9;
+        return c.add(rc.rectangle(x, y, ww, hh, o(Object.assign({ stroke: color, fill: color, fillStyle: solid ? "solid" : "hachure", hachureGap: 4.2, fillWeight: 1.3, hachureAngle: -41, strokeWidth: 1.5 }, extra))));
+      },
+      dot(x, y, d, color) { return c.add(rc.circle(x, y, d, o({ stroke: color, fill: color, fillStyle: "solid", strokeWidth: 1.2, roughness: .5 }))); },
+      poly(pts, color, sw) { return c.add(rc.linearPath(pts, o({ stroke: color, strokeWidth: sw || 2.2, roughness: .7 }))); },
+      text(x, y, s, cls, anchor) { c.tx.push(`<text x="${x}" y="${y}" text-anchor="${anchor || "start"}" class="${cls || ""}">${s}</text>`); },
+      grid(x1, y1, x2, y2) { c.gl.push(`<line class="grid" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`); },
+      hit(x, y, ww, hh, html) { c.ht.push(`<rect class="hit" x="${x}" y="${y}" width="${Math.max(1, ww)}" height="${hh}" rx="6" data-tip="${esc(html)}"/>`); },
+      hitc(x, y, r, html) { c.ht.push(`<circle class="hit" cx="${x}" cy="${y}" r="${r}" data-tip="${esc(html)}"/>`); },
+      done() { svg.querySelector(".gl").innerHTML = c.gl.join(""); svg.querySelector(".tx").innerHTML = c.tx.join(""); svg.querySelector(".ht").innerHTML = c.ht.join(""); armDraw(el); }
+    };
+    return c;
+  }
+  function axisX(c, x, ticks, y0, y1, label) {
+    ticks.forEach(v => {
+      if (v === 0) c.line(x(v), y0, x(v), y1, P.pencil, 1.3); else c.grid(x(v), y0, x(v), y1);
+      c.text(x(v), y1 + 17, tickFmt(v), "t-k", "middle");
+    });
+    if (label) c.text(c.w, y1 + 34, label, "t-k", "end");
+  }
+  const narrow = el => W(el) < 420;
+
+  function forest(el, o) {
+    const w = W(el), lw = Math.min(o.labelW || 160, w * .4), rw = o.rightW ?? 66, rh = o.rowH || 42, top = 6, bot = o.xlabel ? 44 : 30;
+    const h = top + o.rows.length * rh + bot, c = base(el, h, o.aria), x = lin(o.domain, [lw + 10, w - rw]);
+    axisX(c, x, niceTicks(o.domain[0], o.domain[1], narrow(el) ? 3 : (o.ticks || 5)), top, h - bot + 4, o.xlabel);
+    o.rows.forEach((r, i) => {
+      const cy = top + i * rh + rh / 2;
+      if (r.header) { c.text(0, cy + 6, esc(r.header), "t-h"); return; }
+      c.text(0, cy + (r.sub ? -2 : 5), esc(r.label), "t-l");
+      if (r.sub) c.text(0, cy + 15, esc(r.sub), "t-s");
+      const color = col(r.c);
+      if (r.lo != null) {
+        const a = Math.max(x(r.lo), lw + 10), b = Math.min(x(r.hi), w - rw);
+        c.line(a, cy, b, cy, color, 2.2); c.line(a, cy - 6, a, cy + 6, color, 2); c.line(b, cy - 6, b, cy + 6, color, 2);
+      }
+      c.dot(x(r.v), cy, 13, color);
+      c.text(w - rw + 12, cy + 5, r.vtxt ?? fs(r.v, o.d ?? 2), "t-v");
+      c.hit(0, cy - rh / 2, w, rh, `<b>${esc(r.label)}</b>${r.sub ? " · " + esc(r.sub) : ""}<br>${r.vtxt ?? fs(r.v, o.d ?? 3)}${r.lo != null ? ` [${f(r.lo, o.d ?? 3)}, ${f(r.hi, o.d ?? 3)}]` : ""}${r.note ? "<br>" + esc(r.note) : ""}`);
+    });
+    c.done();
+  }
+
+  function bars(el, o) {
+    const w = W(el), lw = Math.min(o.labelW || 150, w * .42), rw = o.rightW ?? 70, rh = o.rowH || 38, bh = o.bh || 18, top = 4, bot = o.xlabel ? 44 : 30;
+    const h = top + o.rows.length * rh + bot, c = base(el, h, o.aria), x = lin(o.domain, [lw + 10, w - rw]);
+    axisX(c, x, niceTicks(o.domain[0], o.domain[1], narrow(el) ? 3 : (o.ticks || 4)), top, h - bot + 4, o.xlabel);
+    o.rows.forEach((r, i) => {
+      const cy = top + i * rh + rh / 2;
+      if (r.header) { c.text(0, cy + 6, esc(r.header), "t-h"); return; }
+      c.text(0, cy + (r.sub ? -2 : 5), esc(r.label), r.dim ? "t-s" : "t-l");
+      if (r.sub) c.text(0, cy + 15, esc(r.sub), "t-s");
+      const color = col(r.c), v = Math.max(o.domain[0], Math.min(o.domain[1], r.v)), x0 = x(0), x1 = x(v);
+      if (Math.abs(x1 - x0) > 1) c.rect(Math.min(x0, x1), cy - bh / 2, Math.abs(x1 - x0), bh, color, r.dim ? { fillWeight: .8, hachureGap: 6 } : null);
+      if (r.lo != null) {
+        const a = x(Math.max(o.domain[0], r.lo)), b = x(Math.min(o.domain[1], r.hi));
+        c.line(a, cy, b, cy, P.ink, 1.4); c.line(a, cy - 5, a, cy + 5, P.ink, 1.4); c.line(b, cy - 5, b, cy + 5, P.ink, 1.4);
+      }
+      c.text(w - rw + 12, cy + 5, r.vtxt ?? f(r.v, o.d ?? 3), "t-v");
+      if (r.flag) c.text(w - rw + 12, cy + 19, esc(r.flag), "t-s");
+      c.hit(0, cy - rh / 2, w, rh, `<b>${esc(r.label)}</b>${r.sub ? " · " + esc(r.sub) : ""}<br>${r.vtxt ?? f(r.v, o.d ?? 3)}${r.citxt ? " " + r.citxt : r.lo != null ? ` [${f(r.lo, o.d ?? 3)}, ${f(r.hi, o.d ?? 3)}]` : ""}${r.note ? "<br>" + esc(r.note) : ""}`);
+    });
+    c.done();
+  }
+
+  function lineChart(el, o) {
+    const w = W(el), h = o.h || 250, l = o.left || 46, r = o.right || 66, top = 14, b = o.xlabel ? 46 : 32;
+    const c = base(el, h, o.aria), x = lin(o.xd, [l, w - r]), y = lin(o.yd, [h - b, top]);
+    niceTicks(o.yd[0], o.yd[1], o.yticks || 4).forEach(v => { c.grid(l, y(v), w - r, y(v)); c.text(l - 8, y(v) + 5, o.yfmt ? o.yfmt(v) : tickFmt(v), "t-k", "end"); });
+    c.line(l, h - b, w - r, h - b, P.pencil, 1.3);
+    o.xticks.forEach(([v, lab]) => c.text(x(v), h - b + 18, lab, "t-k", "middle"));
+    if (o.xlabel) c.text((l + w - r) / 2, h - 6, o.xlabel, "t-k", "middle");
+    if (o.marker != null) c.line(x(o.marker), top, x(o.marker), h - b, P.ink, 1.2, { strokeLineDash: [4, 5] });
+    o.series.forEach(se => {
+      const color = col(se.c), pts = se.vals.map((v, i) => [x(o.xs[i]), y(v)]);
+      c.poly(pts, color, 2.4);
+      pts.forEach((p, i) => { const big = o.marker != null ? o.xs[i] === o.marker : i === pts.length - 1; if (o.dots || big) c.dot(p[0], p[1], big ? 12 : 8, color); });
+      if (se.end !== false) { const p = pts[pts.length - 1]; c.text(p[0] + 10, p[1] + 5 + (se.dy || 0), se.endTxt ?? (o.vfmt ? o.vfmt(se.vals[se.vals.length - 1]) : f(se.vals[se.vals.length - 1], 3)), "t-v"); }
+    });
+    o.xs.forEach((xv, i) => {
+      const x0 = i === 0 ? l : (x(o.xs[i - 1]) + x(xv)) / 2, x1 = i === o.xs.length - 1 ? w - r : (x(xv) + x(o.xs[i + 1])) / 2;
+      c.hit(x0, top, x1 - x0, h - b - top, `<b>${esc(o.tipX ? o.tipX(xv, i) : xv)}</b>` + o.series.map(se => `<br>${esc(se.name)}: ${o.vfmt ? o.vfmt(se.vals[i]) : f(se.vals[i], 4)}`).join("") + (o.tipExtra ? o.tipExtra(i) : ""));
+    });
+    c.done();
+  }
+
+  /* ---------- SMIL motion: pause when off screen ---------- */
+  const visible = new WeakMap();
+  const motionIO = "IntersectionObserver" in window ? new IntersectionObserver(es => es.forEach(e => {
+    visible.set(e.target, e.isIntersecting);
+    try { if (e.isIntersecting && !reduce) e.target.unpauseAnimations(); else e.target.pauseAnimations(); } catch (err) {}
+  })) : null;
+  function syncMotion(svg) {
+    if (motionIO && !visible.has(svg)) motionIO.observe(svg);
+    try { if (reduce || visible.get(svg) === false) svg.pauseAnimations(); } catch (e) {}
+  }
+  function runners(parent, d, color, n, dur) {
+    const g = document.createElementNS(NS, "g");
+    let s = "";
+    for (let i = 0; i < n; i++) s += `<circle r="5" style="fill:${color};stroke:${P.paper};stroke-width:1.5"><animateMotion dur="${dur}s" repeatCount="indefinite" begin="${(-i * dur / n).toFixed(2)}s" path="${d}"/></circle>`;
+    g.innerHTML = s; parent.appendChild(g);
+  }
+
+  /* ---------- the case diagram (chapters 2, 4 and 8) ---------- */
+  const seedOf = s => { let h = 7; for (const ch of s) h = (h * 31 + ch.charCodeAt(0)) % 99991; return h + 1; };
+  function drawCase(svg, mode, animate) {
+    svg.innerHTML = "";
+    const rc = R.svg(svg), lr = document.createElementNS(NS, "g"), lm = document.createElementNS(NS, "g"), lt = document.createElementNS(NS, "g");
+    svg.appendChild(lr); svg.appendChild(lm); svg.appendChild(lt);
+    const txt = [];
+    const add = (n, draw) => { if (draw) n.setAttribute("data-draw", "1"); lr.appendChild(n); return n; };
+    const T = (x, y, s, cls, a) => txt.push(`<text x="${x}" y="${y}" text-anchor="${a || "middle"}" class="${cls || "d-s"}">${s}</text>`);
+    const box = (id, x, y, w, h, stroke, op) => { op = op || {}; return add(rc.rectangle(x, y, w, h, { seed: seedOf(id), stroke, strokeWidth: op.sw || 1.7, roughness: 1, bowing: .9, fill: op.fill, fillStyle: op.fill ? "hachure" : undefined, hachureGap: 7, fillWeight: .9, strokeLineDash: op.dash }), op.draw); };
+    const arrow = (id, pts, color, op) => {
+      op = op || {};
+      const b = { seed: seedOf(id), stroke: color, strokeWidth: op.sw || 1.7, roughness: .8, strokeLineDash: op.dash };
+      add(op.d ? rc.path(op.d, b) : rc.linearPath(pts, b), op.draw);
+      const [ex, ey] = op.d ? op.end : pts[pts.length - 1], [fx, fy] = op.d ? op.from : pts[pts.length - 2];
+      const a = Math.atan2(ey - fy, ex - fx), L = 12, s = .45;
+      add(rc.linearPath([[ex - L * Math.cos(a - s), ey - L * Math.sin(a - s)], [ex, ey], [ex - L * Math.cos(a + s), ey - L * Math.sin(a + s)]], { seed: seedOf(id + "h"), stroke: color, strokeWidth: op.sw || 1.7, roughness: .4 }), op.draw);
+    };
+    const X = (id, x, y, s, color) => { add(rc.line(x - s, y - s, x + s, y + s, { seed: seedOf(id), stroke: color, strokeWidth: 2.8, roughness: 1 })); add(rc.line(x + s, y - s, x - s, y + s, { seed: seedOf(id + "2"), stroke: color, strokeWidth: 2.8, roughness: 1 })); };
+    const boxT = (x, w, y, s1, s2, h) => { T(x + w / 2, y + (h || 76) / 2 - 3, s1, "d-t"); if (s2) T(x + w / 2, y + (h || 76) / 2 + 19, s2, "d-s"); };
+
+    const portrait = ((svg.parentNode && svg.parentNode.clientWidth) || 600) < 520;
+    svg.setAttribute("viewBox", portrait ? "0 0 360 400" : "0 0 640 390");
+    if (portrait) {
+      /* phone layout: the loop runs top to bottom, feedback returns on the left */
+      const BX = 115, BW = 170, WR = [BX, 44, BW, 54], CK = [BX, 138, BW, 54], LR = [BX, 232, BW, 54];
+      const pT = (r, s1, s2) => { T(r[0] + r[2] / 2, r[1] + (s2 ? 22 : 33), s1, "d-t"); if (s2) T(r[0] + r[2] / 2, r[1] + 42, s2, "d-s"); };
+      const pEdges = (a, b, y2) => {
+        arrow("pe1", [[200, 100], [200, 134]], P.pencil); T(210, 122, a, "d-e", "start");
+        arrow("pe2", [[200, 194], [200, y2 || 228]], P.pencil); T(210, 216, b, "d-e", "start");
+      };
+      const pEval = (sub, y0) => {
+        arrow("pev", [[200, y0 || 288], [200, 336]], P.pencil, { dash: [5, 5] });
+        box("pevb", BX, 340, BW, 52, P.ink); T(200, 361, t("Real-text check", "真实文本检查"), "d-t"); T(200, 381, sub || t("independent passages", "独立段落"), "d-s");
+      };
+      const pNotes = lines => lines.forEach((s, i) => T(6, 356 + i * 17, s, "d-n d-sm", "start"));
+      const arcP = "M113 259 C30 259,30 71,111 71";
+      const chunk = s => { box("ch", ...CK, P.ink); pT(CK, t("Chunk xₜ", "文本段 xₜ"), s || t("1024 tokens", "1024 个 token")); };
+      if (mode === "closed" || mode === "verdict") {
+        if (mode === "verdict") {
+          add(rc.ellipse(52, 165, 88, 236, { seed: seedOf("phalo"), stroke: P.ink, strokeWidth: 1.4, roughness: 1.8 }), true);
+          T(200, 24, t("the culprit: feedback", "真凶：反馈"), "d-o");
+          pNotes(t(["cut this and", "98% of the", "harm goes"], ["切断这里，", "98% 的伤害", "就消失了"]));
+        } else {
+          T(200, 24, t("Wₜ₊₁ writes the next chunk ↺", "Wₜ₊₁ 写下一段 ↺"), "d-o");
+          pNotes(t(["Every update", "changes what it", "learns from next."], ["每次更新都会", "改变它下次", "要学的文本。"]));
+        }
+        arrow("parc", null, P.closed, { d: arcP, end: [111, 71], from: [30, 71], sw: mode === "verdict" ? 3.6 : 2.8, draw: true });
+        pEdges(t("writes", "写"), t("learns", "学"));
+        box("gen", ...WR, P.closed, { sw: 2.2 }); pT(WR, t("Writer", "写手"), t("Wₜ = the learner", "Wₜ 即学习者"));
+        chunk();
+        box("ln", ...LR, P.closed, { sw: 2.2 }); pT(LR, t("Learner", "学习者"), t("keeps every update", "保留每次更新"));
+        pEval();
+        runners(lm, "M200 71 L200 259 L113 259 C30 259,30 71,111 71 L200 71", P.closed, 3, 6);
+      }
+      if (mode === "off") {
+        T(200, 24, t("nothing comes back to the writer", "没有任何东西回到写手那里"), "d-n");
+        pEdges(t("writes", "写"), t("reads", "读"));
+        box("gen", ...WR, P.ink); pT(WR, t("Writer", "写手"), t("stays W₀", "始终是 W₀"));
+        chunk();
+        box("ln", ...LR, P.off, { dash: [6, 5] }); pT(LR, t("Learner", "学习者"), t("computes an update", "算出一次更新"));
+        arrow("ptrash", null, P.off, { d: "M140 290 C130 318,104 326,82 336", end: [82, 336], from: [100, 328], dash: [5, 5] });
+        box("bin", 6, 340, 102, 52, P.off, { dash: [6, 5] });
+        T(57, 362, t("thrown", "丢弃"), "d-t"); T(57, 381, t("away", "这次更新"), "d-s");
+        pEval();
+        runners(lm, "M200 71 L200 259 L140 290 C130 318,104 326,82 336", P.off, 2, 3.4);
+      }
+      if (mode === "fixed") {
+        arrow("parc", null, P.faint, { d: arcP, end: [111, 71], from: [30, 71], dash: [8, 7], sw: 2 });
+        X("pcut", 51, 165, 11, P.ink);
+        T(200, 24, t("the learner can't reach the writer", "学习者够不到写手"), "d-o");
+        pEdges(t("writes", "写"), t("learns", "学"));
+        box("gen", ...WR, P.fixed, { sw: 2.2, fill: P.fixed }); pT(WR, t("Frozen W₀", "冻结的 W₀"), t("a separate copy", "独立副本"));
+        chunk(t("synthetic, still", "仍是合成文本"));
+        box("ln", ...LR, P.closed, { sw: 2.2 }); pT(LR, t("Learner Wₜ", "学习者 Wₜ"), t("keeps every update", "保留每次更新"));
+        pEval(t("+.052 nats left", "只剩 +.052 nats"));
+        pNotes(t(["Same text, same", "updates. Only the", "feedback is cut."], ["同样的文本，", "同样多的更新，", "只切断了反馈。"]));
+        runners(lm, "M200 71 L200 259", P.fixed, 2, 3);
+      }
+      if (mode === "replayA" || mode === "replayB") {
+        const B = mode === "replayB";
+        T(200, 24, t("the text is recorded in advance", "文本是事先录好的"), "d-n");
+        arrow("pe1", [[200, 104], [200, 134]], P.pencil); T(210, 124, t("replays", "回放"), "d-e", "start");
+        arrow("pe2", [[200, 194], [200, 222]], P.pencil); T(210, 212, t("reads", "读"), "d-e", "start");
+        box("tape", BX, 40, BW, 62, P.ink, { dash: [3, 4] });
+        add(rc.circle(172, 55, 16, { seed: seedOf("pr1"), stroke: P.pencil, strokeWidth: 1.5 })); add(rc.circle(228, 55, 16, { seed: seedOf("pr2"), stroke: P.pencil, strokeWidth: 1.5 }));
+        add(rc.line(172, 63, 228, 63, { seed: seedOf("pr3"), stroke: P.pencil, strokeWidth: 1.3 }));
+        T(200, 82, t("Recording", "录制"), "d-t"); T(200, 97, t("already degraded", "已经退化"), "d-s");
+        chunk(t("identical both times", "两遍完全相同"));
+        box("lnR", BX, 226, BW, 80, P.closed, { sw: 2.2 });
+        T(200, 245, t("Fresh receiver", "全新接收者"), "d-t");
+        add(rc.rectangle(BX + 6, B ? 280 : 255, BW - 12, 22, { seed: seedOf(B ? "phB" : "phA"), stroke: "none", fill: B ? P.hlc : P.rule, fillStyle: "solid", roughness: 1.2 }), true);
+        T(BX + 14, 271, t("A · read only", "A · 只读"), B ? "d-s" : "d-t", "start");
+        T(BX + 14, 296, t("B · read + keep", "B · 读并保留"), B ? "d-t" : "d-s", "start");
+        pEval(B ? t("+3.874 (2.268 writing)", "+3.874（写入 2.268）") : "+1.606 nats", 308);
+        pNotes(B ? t(["Same tokens.", "Extra harm is", "in the weights."], ["同样的 token，", "多出的伤害", "存进了权重。"]) : t(["Only reading.", "Degraded text", "already hurts."], ["只是读，", "退化文本就", "已经有伤害。"]));
+        runners(lm, "M200 71 L200 259", P.closed, 2, 3);
+      }
+      if (mode === "settle") {
+        box("pq", 4, 4, 104, 26, P.ink); T(56, 22, t("real text q", "真实文本 q"), "d-s");
+        arrow("pqa", [[22, 32], [22, 154]], P.ink);
+        arrow("ps1", [[113, 259], [56, 259], [56, 195]], P.settle, { sw: 2.4, draw: true }); T(8, 282, t("candidate δ", "候选 δ"), "d-e", "start");
+        add(rc.polygon([[56, 139], [100, 165], [56, 191], [12, 165]], { seed: seedOf("pgate"), stroke: P.settle, strokeWidth: 2.4, roughness: .9, fill: P.card, fillStyle: "solid" }));
+        T(56, 170, "A ≥ 0 ?", "d-t");
+        arrow("ps2", [[56, 137], [56, 71], [111, 71]], P.settle, { sw: 2.4, draw: true }); T(62, 122, t("yes: commit", "是：提交"), "d-g", "start");
+        T(62, 216, t("no: drop δ", "否：丢弃 δ"), "d-n", "start");
+        pEdges(t("writes", "写"), t("proposes", "提出"));
+        box("gen", ...WR, P.ink); pT(WR, t("Writer", "写手"), t("committed W", "已提交的 W"));
+        chunk();
+        box("ln", ...LR, P.settle, { sw: 2.2 }); pT(LR, t("Learner", "学习者"), t("proposes W + δ", "提出 W + δ"));
+        pEval();
+        runners(lm, "M200 71 L200 259 L56 259 L56 71 L200 71", P.settle, 3, 6);
+      }
+    } else {
+    const GEN = [30, 170, 150, 76], CH = [245, 170, 150, 76], LN = [460, 170, 150, 76];
+    const arcD = "M535 166 C535 40,105 40,105 164";
+    const edges = (a, b) => {
+      arrow("e1", [[184, 208], [241, 208]], P.pencil); T(212, 197, a, "d-e");
+      arrow("e2", [[399, 208], [456, 208]], P.pencil); T(427, 197, b, "d-e");
+    };
+    const evalBox = (sub, y0) => {
+      arrow("ev", [[535, y0 || 250], [535, 296]], P.pencil, { dash: [5, 5] }); T(546, 280, t("check", "检查"), "d-e", "start");
+      box("evb", 440, 300, 190, 62, P.ink); T(535, 326, t("Real-text check", "真实文本检查"), "d-t"); T(535, 347, sub || t("independent passages", "独立段落"), "d-s");
+    };
+    const notes = lines => lines.forEach((s, i) => T(30, 316 + i * 21, s, "d-n", "start"));
+    const chunkSub = t("1024 tokens", "1024 个 token");
+
+    if (mode === "closed" || mode === "verdict") {
+      if (mode === "verdict") {
+        add(rc.ellipse(320, 74, 330, 78, { seed: seedOf("halo"), stroke: P.ink, strokeWidth: 1.4, roughness: 1.8 }), true);
+        T(320, 22, t("the culprit: feedback", "真凶：反馈"), "d-o");
+      }
+      arrow("arc", null, P.closed, { d: arcD, end: [105, 164], from: [105, 40], sw: mode === "verdict" ? 3.6 : 2.8, draw: true });
+      if (mode !== "verdict") T(320, 56, t("Wₜ₊₁ writes the next chunk", "Wₜ₊₁ 写下一段"), "d-o");
+      else T(320, 132, t("cut this and 98% of the harm goes", "切断这里，98% 的伤害消失"), "d-s");
+      edges(t("writes", "写"), t("learns", "学"));
+      box("gen", ...GEN, P.closed, { sw: 2.2 }); boxT(GEN[0], GEN[2], GEN[1], t("Writer", "写手"), t("Wₜ, the learner itself", "Wₜ 即学习者"));
+      box("ch", ...CH, P.ink); boxT(CH[0], CH[2], CH[1], t("Chunk xₜ", "文本段 xₜ"), chunkSub);
+      box("ln", ...LN, P.closed, { sw: 2.2 }); boxT(LN[0], LN[2], LN[1], t("Learner", "学习者"), t("keeps every update", "保留每次更新"));
+      evalBox();
+      if (mode === "closed") notes(t(["Every update changes", "the text it will learn", "from next."], ["每次更新都会改变", "它下一次要学的文本。"]));
+      runners(lm, "M105 208 L535 208 L535 166 C535 40,105 40,105 164 L105 208", P.closed, 3, 6);
+    }
+    if (mode === "off") {
+      T(320, 96, t("nothing comes back to the writer", "没有任何东西回到写手那里"), "d-n");
+      edges(t("writes", "写"), t("reads", "读"));
+      box("gen", ...GEN, P.ink); boxT(GEN[0], GEN[2], GEN[1], t("Writer", "写手"), t("stays W₀", "始终是 W₀"));
+      box("ch", ...CH, P.ink); boxT(CH[0], CH[2], CH[1], t("Chunk xₜ", "文本段 xₜ"), chunkSub);
+      box("ln", ...LN, P.off, { dash: [6, 5] }); boxT(LN[0], LN[2], LN[1], t("Learner", "学习者"), t("computes an update", "算出一次更新"));
+      arrow("trash", null, P.off, { d: "M480 250 C480 300,450 330,406 330", end: [406, 330], from: [450, 330], dash: [5, 5] });
+      box("bin", 250, 300, 152, 60, P.off, { dash: [6, 5] }); X("binx", 272, 318, 7, P.off);
+      T(334, 326, t("thrown away", "丢弃"), "d-t"); T(326, 347, t("the update", "这次更新"), "d-s");
+      evalBox();
+      notes(t(["Tokens still sit in", "attention. Only the", "write is removed."], ["token 仍在注意力里，", "只是去掉了写入。"]));
+      runners(lm, "M105 208 L480 208 L480 250 C480 300,450 330,406 330", P.off, 2, 3.4);
+    }
+    if (mode === "fixed") {
+      arrow("arc", null, P.faint, { d: arcD, end: [105, 164], from: [105, 40], dash: [8, 7], sw: 2 });
+      X("cut", 320, 72, 13, P.ink);
+      T(320, 26, t("the learner can't reach the writer", "学习者够不到写手"), "d-o");
+      edges(t("writes", "写"), t("learns", "学"));
+      box("gen", ...GEN, P.fixed, { sw: 2.2, fill: P.fixed }); boxT(GEN[0], GEN[2], GEN[1], t("Frozen W₀", "冻结的 W₀"), t("a separate copy", "独立副本"));
+      box("ch", ...CH, P.ink); boxT(CH[0], CH[2], CH[1], t("Chunk xₜ", "文本段 xₜ"), t("synthetic, still", "仍是合成文本"));
+      box("ln", ...LN, P.closed, { sw: 2.2 }); boxT(LN[0], LN[2], LN[1], t("Learner Wₜ", "学习者 Wₜ"), t("keeps every update", "保留每次更新"));
+      evalBox(t("+.052 nats left", "只剩 +.052 nats"));
+      notes(t(["Same synthetic text,", "same number of updates.", "Only the feedback is cut."], ["同样的合成文本，", "同样多的更新，", "只切断了反馈。"]));
+      runners(lm, "M105 208 L535 208", P.fixed, 2, 3);
+    }
+    if (mode === "replayA" || mode === "replayB") {
+      const B = mode === "replayB";
+      T(320, 96, t("the text is recorded in advance", "文本是事先录好的"), "d-n");
+      edges(t("replays", "回放"), t("reads", "读"));
+      box("tape", ...GEN, P.ink, { dash: [3, 4] });
+      add(rc.circle(78, 192, 22, { seed: seedOf("r1"), stroke: P.pencil, strokeWidth: 1.5 })); add(rc.circle(132, 192, 22, { seed: seedOf("r2"), stroke: P.pencil, strokeWidth: 1.5 }));
+      add(rc.line(78, 203, 132, 203, { seed: seedOf("r3"), stroke: P.pencil, strokeWidth: 1.3 }));
+      T(105, 226, t("Recording", "录制"), "d-t"); T(105, 242, t("already degraded", "已经退化"), "d-s");
+      box("ch", ...CH, P.ink); boxT(CH[0], CH[2], CH[1], t("Chunk xₜ", "文本段 xₜ"), t("identical both times", "两遍完全相同"));
+      box("lnR", 460, 150, 150, 100, P.closed, { sw: 2.2 });
+      T(535, 172, t("Fresh receiver", "全新接收者"), "d-t");
+      add(rc.line(472, 182, 598, 182, { seed: seedOf("div"), stroke: P.rule, strokeWidth: 1.2 }));
+      add(rc.rectangle(468, B ? 216 : 190, 134, 26, { seed: seedOf(B ? "hlB" : "hlA"), stroke: "none", fill: B ? P.hlc : P.rule, fillStyle: "solid", roughness: 1.2 }), true);
+      T(482, 208, t("A · read only", "A · 只读"), B ? "d-s" : "d-t", "start");
+      T(482, 234, t("B · read + keep", "B · 读并保留"), B ? "d-t" : "d-s", "start");
+      evalBox(B ? t("+3.874 (2.268 from writing)", "+3.874（写入占 2.268）") : "+1.606 nats", 252);
+      notes(B ? t(["Same tokens as pass A.", "The extra harm is", "stored in the weights."], ["和 A 遍同样的 token，", "多出的伤害", "存进了权重。"])
+              : t(["The receiver only reads.", "Degraded text already", "hurts in attention."], ["接收者只读。", "退化文本在注意力里", "就已经有伤害。"]));
+      runners(lm, "M105 208 L535 208", P.closed, 2, 3);
+    }
+    if (mode === "settle") {
+      box("q", 262, 8, 116, 32, P.ink); T(320, 30, t("real text q", "真实文本 q"), "d-s");
+      arrow("qa", [[320, 42], [320, 62]], P.ink);
+      arrow("s1", [[535, 166], [535, 96], [376, 96]], P.settle, { sw: 2.4, draw: true }); T(456, 86, t("candidate W + δ", "候选 W + δ"), "d-e");
+      add(rc.polygon([[320, 66], [374, 96], [320, 126], [266, 96]], { seed: seedOf("gate"), stroke: P.settle, strokeWidth: 2.4, roughness: .9, fill: P.card, fillStyle: "solid" }));
+      T(320, 102, "A ≥ 0 ?", "d-t");
+      arrow("s2", [[264, 96], [105, 96], [105, 164]], P.settle, { sw: 2.4, draw: true }); T(185, 86, t("yes: commit", "是：提交"), "d-g");
+      arrow("rej", [[320, 128], [320, 158]], P.faint, { dash: [4, 4] }); T(330, 152, t("no: drop δ", "否：丢弃 δ"), "d-n", "start");
+      edges(t("writes", "写"), t("proposes", "提出"));
+      box("gen", ...GEN, P.ink); boxT(GEN[0], GEN[2], GEN[1], t("Writer", "写手"), t("committed W", "已提交的 W"));
+      box("ch", ...CH, P.ink); boxT(CH[0], CH[2], CH[1], t("Chunk xₜ", "文本段 xₜ"), chunkSub);
+      box("ln", ...LN, P.settle, { sw: 2.2 }); boxT(LN[0], LN[2], LN[1], t("Learner", "学习者"), t("proposes W + δ", "提出 W + δ"));
+      evalBox();
+      notes(t(["Only updates that help", "on independent text", "ever reach the writer."], ["只有在独立文本上", "有帮助的更新，", "才会回到写手。"]));
+      runners(lm, "M105 208 L535 208 L535 96 L105 96 L105 208", P.settle, 3, 6);
+    }
+    }
+    lt.innerHTML = txt.join("");
+    if (animate && !reduce) drawOn(lr);
+    syncMotion(svg);
+  }
+  function drawOn(g) {
+    const paths = $$('[data-draw] path', g).filter(p => !p.getAttribute("stroke-dasharray"));
+    paths.forEach(p => { const L = p.getTotalLength(); p.style.strokeDasharray = L; p.style.strokeDashoffset = L; });
+    g.getBoundingClientRect();
+    requestAnimationFrame(() => paths.forEach(p => { p.style.transition = "stroke-dashoffset .9s ease-out"; p.style.strokeDashoffset = 0; }));
+  }
+
+  /* ---------- hero snake ---------- */
+  let snakeSeed = 4, snakeFirst = true;
+  function drawSnake(animate) {
+    const svg = $("#snake"); svg.innerHTML = "";
+    const rc = R.svg(svg), g = document.createElementNS(NS, "g"), m = document.createElementNS(NS, "g"), hd = document.createElementNS(NS, "g");
+    svg.appendChild(g); svg.appendChild(m); svg.appendChild(hd);
+    const cx = 200, cy = 200, rO = 112, rI = 89, rM = (rO + rI) / 2;
+    const pt = (deg, r) => { const a = deg * Math.PI / 180; return [+(cx + r * Math.cos(a)).toFixed(1), +(cy + r * Math.sin(a)).toFixed(1)]; };
+    const a0 = -74, a1 = 232, tipA = 257;
+    const body = `M${pt(a0, rO)} A${rO} ${rO} 0 1 1 ${pt(a1, rO)} L${pt(tipA, rM)} L${pt(a1, rI)} A${rI} ${rI} 0 1 0 ${pt(a0, rI)} Z`;
+    g.appendChild(rc.path(body, { seed: snakeSeed, stroke: P.ink, strokeWidth: 2, roughness: 1, fill: P.closed, fillStyle: "hachure", hachureGap: 6.5, fillWeight: 1.3, hachureAngle: 30 }));
+    for (let d = a0 + 18; d < a1 - 6; d += 24) { const p1 = pt(d, rO - 4), p2 = pt(d + 7, rI + 4); g.appendChild(rc.line(p1[0], p1[1], p2[0], p2[1], { seed: snakeSeed * 100 + d, stroke: P.ink, strokeWidth: 1, roughness: .8 })); }
+    // a token travelling the loop, the way the head leads (counter-clockwise on screen)
+    if (!reduce) m.innerHTML = `<circle r="6" style="fill:${P.ink};stroke:${P.paper};stroke-width:2"><animateMotion dur="7s" repeatCount="indefinite" path="M${cx} ${cy - rM} A${rM} ${rM} 0 1 0 ${cx} ${cy + rM} A${rM} ${rM} 0 1 0 ${cx} ${cy - rM}"/></circle>`;
+    const [hx, hy] = pt(-90, rM);
+    hd.appendChild(rc.ellipse(hx - 4, hy, 58, 42, { seed: snakeSeed + 5, stroke: P.ink, strokeWidth: 2.2, roughness: 1, fill: P.card, fillStyle: "solid" }));
+    hd.appendChild(rc.circle(hx - 17, hy - 6, 7, { seed: snakeSeed + 6, stroke: P.ink, fill: P.ink, fillStyle: "solid", roughness: .4 }));
+    hd.appendChild(rc.linearPath([[hx - 32, hy + 7], [hx - 20, hy + 10], [hx - 10, hy + 8]], { seed: snakeSeed + 7, stroke: P.ink, strokeWidth: 1.6, roughness: .6 }));
+    const tx = (x, y, s, cls, a) => `<text x="${x}" y="${y}" text-anchor="${a || "middle"}" class="${cls}">${s}</text>`;
+    const lab = document.createElementNS(NS, "g");
+    lab.innerHTML =
+      tx(82, 192, t("Wₜ writes", "Wₜ 写出"), "d-s", "end") + tx(82, 211, "xₜ", "d-s", "end") +
+      tx(cx, cy + rO + 34, t("learns from xₜ", "从 xₜ 中学习"), "d-s") +
+      tx(cx + rO + 10, 192, t("becomes", "变成"), "d-s", "start") + tx(cx + rO + 10, 211, "Wₜ₊₁", "d-s", "start") +
+      tx(hx + 34, hy - 30, t("…and writes again", "……然后再写"), "d-n", "start") +
+      tx(cx, cy - 14, t("128K tokens later", "128K token 之后"), "d-s") +
+      tx(cx, cy + 16, "+3.01 nats", "d-big") +
+      tx(cx, cy + 38, t("worse on real text", "真实文本上变差"), "d-s");
+    svg.appendChild(lab);
+    if ((animate || snakeFirst) && !reduce) {
+      const ps = [...$$("path", g), ...$$("path", hd)];
+      ps.forEach(p => { const L = p.getTotalLength(); p.style.strokeDasharray = L; p.style.strokeDashoffset = L; });
+      svg.getBoundingClientRect();
+      requestAnimationFrame(() => ps.forEach((p, i) => { p.style.transition = `stroke-dashoffset ${animate ? 1.1 : 1.6}s ease-out ${Math.min(i * 6, 600)}ms`; p.style.strokeDashoffset = 0; }));
+    }
+    snakeFirst = false;
+    syncMotion(svg);
+  }
+  function redrawSnake() { snakeSeed = 4 + Math.floor(Math.random() * 900); drawSnake(true); }
+  $("#snake").addEventListener("click", redrawSnake);
+  $("#snake").addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); redrawSnake(); } });
+
+  /* chapter 1 mini sketches */
+  function drawRW() {
+    [["#sk-read", false], ["#sk-write", true]].forEach(([id, write]) => {
+      const svg = $(id); svg.innerHTML = ""; const rc = R.svg(svg);
+      svg.appendChild(rc.rectangle(14, 22, 64, 48, { seed: 3, stroke: P.ink, strokeWidth: 1.6 }));
+      [34, 44, 54].forEach((y, i) => svg.appendChild(rc.line(24, y, 68, y, { seed: 4 + i, stroke: P.pencil, strokeWidth: 1 })));
+      svg.appendChild(rc.linearPath([[88, 46], [128, 46]], { seed: 8, stroke: P.pencil, strokeWidth: 1.6 }));
+      svg.appendChild(rc.linearPath([[120, 40], [128, 46], [120, 52]], { seed: 9, stroke: P.pencil, strokeWidth: 1.6 }));
+      svg.appendChild(rc.rectangle(138, 18, 70, 56, { seed: 12, stroke: P.ink, strokeWidth: 1.6, strokeLineDash: [5, 4] }));
+      const lab = document.createElementNS(NS, "g");
+      let s = `<text x="173" y="50" text-anchor="middle" class="d-s">${t("attention", "注意力")}</text>`;
+      if (write) {
+        svg.appendChild(rc.linearPath([[214, 46], [236, 46]], { seed: 13, stroke: P.closed, strokeWidth: 2 }));
+        svg.appendChild(rc.linearPath([[229, 40], [237, 46], [229, 52]], { seed: 14, stroke: P.closed, strokeWidth: 2 }));
+        svg.appendChild(rc.rectangle(242, 18, 50, 56, { seed: 15, stroke: P.closed, strokeWidth: 2, fill: P.closed, fillStyle: "hachure", hachureGap: 5 }));
+        s += `<text x="267" y="88" text-anchor="middle" class="d-s">${t("weights", "权重")}</text>`;
+      } else {
+        svg.appendChild(rc.rectangle(242, 18, 50, 56, { seed: 15, stroke: P.faint, strokeWidth: 1.4, strokeLineDash: [4, 4] }));
+        s += `<text x="267" y="88" text-anchor="middle" class="d-n">${t("unchanged", "不变")}</text>`;
+      }
+      lab.innerHTML = s; svg.appendChild(lab);
+    });
+  }
+
+  /* ---------- scrollytelling ---------- */
+  const STEPS = $$("#steps .step");
+  const TAGS = () => ({
+    closed: t("Closed Loop · 125M damage +3.01 nats", "闭环 · 125M 损害 +3.01 nats"),
+    fixed: t("Fixed Generation · .052 nats left", "固定生成 · 只剩 .052 nats"),
+    replayA: t("Recorded Replay, pass A · read only", "录制回放 A 遍 · 只读"),
+    replayB: t("Recorded Replay, pass B · read and keep", "录制回放 B 遍 · 读并保留"),
+    verdict: t("Verdict · the feedback link", "结论 · 反馈这条链路")
+  });
+  let caseMode = "closed";
+  $("#caseDots").innerHTML = STEPS.map((s, i) => `<button type="button" data-i="${i}" aria-label="Step ${i + 1}">${i + 1}</button>`).join("");
+  function setCase(m, animate) {
+    if (m === caseMode && animate) return;
+    caseMode = m;
+    STEPS.forEach(s => s.classList.toggle("on", s.dataset.mode === m));
+    $$("#caseDots button").forEach((b, i) => b.classList.toggle("on", STEPS[i].dataset.mode === m));
+    drawCase($("#caseSvg"), m, animate);
+    $("#caseTag").textContent = TAGS()[m];
+  }
+  STEPS.forEach(s => {
+    s.addEventListener("click", () => setCase(s.dataset.mode, true));
+    s.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setCase(s.dataset.mode, true); } });
+  });
+  $$("#caseDots button").forEach(b => b.addEventListener("click", () => {
+    const s = STEPS[+b.dataset.i]; setCase(s.dataset.mode, true);
+    const y = s.getBoundingClientRect().top + scrollY - innerHeight * (oneCol.matches ? .62 : .3);
+    window.scrollTo({ top: y, behavior: reduce ? "auto" : "smooth" });
+  }));
+  /* the trigger line sits mid-screen on desktop, and below the pinned sketch on phones / tablets */
+  const oneCol = matchMedia("(max-width: 900px)");
+  let stepIO = null;
+  function watchSteps() {
+    if (!("IntersectionObserver" in window)) return;
+    if (stepIO) stepIO.disconnect();
+    stepIO = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) setCase(e.target.dataset.mode, true); }),
+      { rootMargin: oneCol.matches ? "-74% 0px -22% 0px" : "-48% 0px -48% 0px" });
+    STEPS.forEach(s => stepIO.observe(s));
+  }
+  watchSteps();
+  if (oneCol.addEventListener) oneCol.addEventListener("change", watchSteps);
+
+  /* ---------- guess game ---------- */
+  let guessRevealed = false;
+  function renderGuess(animateBar) {
+    const el = $("#chGuess"), g = +$("#guessRange").value, h = 108, c = base(el, h, "Your guess vs the measured answer"), w = c.w, l = 14, r = 18;
+    const x = lin([0, 100], [l, w - r]), y0 = 58;
+    c.line(l, y0, w - r, y0, P.pencil, 1.4);
+    [0, 25, 50, 75, 100].forEach(v => { c.line(x(v), y0 - 5, x(v), y0 + 5, P.pencil, 1.2); c.text(x(v), y0 + 22, v + "%", "t-k", "middle"); });
+    if (guessRevealed) {
+      const bar = c.rect(x(0), y0 - 30, x(98.3) - x(0), 22, P.fixed);
+      bar.setAttribute("data-bar", "1");
+      c.text(Math.min(x(98.3), w - r), y0 - 36, t("measured: 98.3%", "实测：98.3%"), "t-v", "end");
+    }
+    c.poly([[x(g) - 7, y0 + 30], [x(g), y0 + 8], [x(g) + 7, y0 + 30], [x(g) - 7, y0 + 30]], P.closed, 2);
+    const lx = Math.max(l + 30, Math.min(x(g), w - r - 30));
+    c.text(lx, y0 + 46, t("your guess", "你的猜测"), "t-l", "middle");
+    c.done();
+    if (animateBar && !reduce) { const ps = $$("[data-bar] path", el); ps.forEach(p => { const L = p.getTotalLength(); p.style.strokeDasharray = L; p.style.strokeDashoffset = L; }); el.getBoundingClientRect(); requestAnimationFrame(() => ps.forEach(p => { p.style.transition = "stroke-dashoffset 1.1s ease-out"; p.style.strokeDashoffset = 0; })); }
+  }
+  function guessMsg() {
+    if (!guessRevealed) { $("#guessMsg").textContent = ""; return; }
+    const g = +$("#guessRange").value;
+    $("#guessMsg").textContent = Math.abs(g - 98.3) <= 5
+      ? t("Spot on. Cutting the feedback removes 98.3% of the damage.", "猜得真准。切断反馈就消除了 98.3% 的损害。")
+      : g < 50 ? t("Most people expect synthetic text itself to be the problem. It mostly isn't: 98.3% of the damage disappears.", "很多人以为问题出在合成文本本身。其实不是：98.3% 的损害都消失了。")
+      : t("Close, but it's even more: 98.3% disappears. Almost all of the damage comes from the feedback link.", "接近了，但实际更多：消失了 98.3%。几乎所有损害都来自反馈这条链路。");
+  }
+  $("#guessRange").addEventListener("input", () => { $("#guessVal").textContent = $("#guessRange").value + "%"; renderGuess(false); guessMsg(); });
+  $("#guessBtn").addEventListener("click", () => { const first = !guessRevealed; guessRevealed = true; renderGuess(first); guessMsg(); });
+
+  /* ---------- exposure ---------- */
+  const EXP = {
+    "0": { n: 0, H: 1.1858, lo: .5326, hi: 1.9430, B: 0, en: "No real text at all: 105 self-written chunks in a row.", zh: "完全没有真实文本：连续 105 段自写。" },
+    "5": { n: 5, H: 1.0275, lo: .5679, hi: 1.6195, B: .1350, en: "5 real chunks, evenly spread.", zh: "5 段真实文本，均匀分布。" },
+    "10": { n: 11, H: .4389, lo: .2517, hi: .6465, B: .0933, en: "11 real chunks, evenly spread.", zh: "11 段真实文本，均匀分布。" },
+    "20": { n: 21, H: .0806, lo: .0657, hi: .0981, B: .0802, en: "21 real chunks, evenly spread.", zh: "21 段真实文本，均匀分布。" },
+    "31e": { n: 33, H: .0694, lo: .0534, hi: .0843, B: .1051, en: "33 real chunks, evenly spread.", zh: "33 段真实文本，均匀分布。" },
+    "31b": { n: 33, H: .7155, lo: .3730, hi: 1.1578, B: .1040, en: "The same 33 real chunks, grouped into bursts.", zh: "同样 33 段真实文本，成团出现。", bursty: true }
+  };
+  const EXP_ORDER = ["0", "5", "10", "20", "31e", "31b"];
+  let expKey = "31e", expTimer = null;
+  function schedule(e) {
+    const out = [];
+    if (e.bursty) { const gr = [7, 7, 7, 6, 6]; for (let g = 0; g < 6; g++) { for (let k = 0; k < 12; k++) out.push(0); if (g < 5) for (let k = 0; k < gr[g]; k++) out.push(1); } return out; }
+    const gen = 105 - e.n, gaps = e.n + 1, b = Math.floor(gen / gaps), extra = gen % gaps;
+    for (let i = 0; i < gaps; i++) { for (let k = 0; k < b + (i < extra ? 1 : 0); k++) out.push(0); if (i < e.n) out.push(1); }
+    return out;
+  }
+  function renderExposure(fromUser) {
+    const e = EXP[expKey], sch = schedule(e), strip = $("#strip");
+    if (!strip.children.length) strip.innerHTML = sch.map((_, i) => `<i style="--i:${i}"></i>`).join("");
+    let best = 0, bs = 0, run = 0;
+    sch.forEach((v, i) => { if (!v) { run++; if (run > best) { best = run; bs = i - run + 1; } } else run = 0; });
+    Array.from(strip.children).forEach((c, i) => { c.className = sch[i] ? "real" : (i >= bs && i < bs + best ? "burst" : ""); });
+    $("#expTitle").textContent = t(e.en + " Read left to right, top to bottom.", e.zh + "从左到右、从上到下阅读。");
+    $("#roBurst").textContent = best;
+    $("#roH").textContent = f(e.H, 4); $("#roHci").textContent = `95% [${f(e.lo, 4)}, ${f(e.hi, 4)}]`;
+    $("#roRel").textContent = Math.round(e.H / 1.1858 * 100) + "%";
+    $("#roB").textContent = e.n ? t(`real-text benefit kept: ${f(e.B, 4)}`, `保留的真实文本收益：${f(e.B, 4)}`) : t("no real text, no benefit", "没有真实文本，也就没有收益");
+    if (fromUser && !reduce) ["#roBurst", "#roH", "#roRel"].forEach(s => { const n = $(s); n.classList.remove("pulse"); void n.offsetWidth; n.classList.add("pulse"); });
+    $$("#expSeg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.k === expKey)));
+    const names = { "0": t("0% real", "0% 真实"), "5": t("5% spread", "5% 均匀"), "10": t("10% spread", "10% 均匀"), "20": t("20% spread", "20% 均匀"), "31e": t("31% spread", "31% 均匀"), "31b": t("31% bursts", "31% 成团") };
+    bars($("#chExp"), { domain: [0, 2], d: 4, labelW: 110, rowH: 32, bh: 16, xlabel: t("damage H, nats", "损害 H（nats）"), aria: "Damage by schedule",
+      rows: EXP_ORDER.map(k => ({ label: names[k], v: EXP[k].H, lo: EXP[k].lo, hi: EXP[k].hi, c: "closed", dim: k !== expKey })) });
+  }
+  function stopPlay() { if (expTimer) { clearInterval(expTimer); expTimer = null; $("#expPlay").querySelector(".en").textContent = "play all"; $("#expPlay").querySelector(".zh").textContent = "依次播放"; } }
+  $$("#expSeg button").forEach(b => b.addEventListener("click", () => { stopPlay(); expKey = b.dataset.k; renderExposure(true); }));
+  $("#expPlay").addEventListener("click", () => {
+    if (expTimer) { stopPlay(); return; }
+    let i = 0; expKey = EXP_ORDER[0]; renderExposure(true);
+    $("#expPlay").querySelector(".en").textContent = "stop"; $("#expPlay").querySelector(".zh").textContent = "停止";
+    expTimer = setInterval(() => { i++; if (i >= EXP_ORDER.length) { stopPlay(); return; } expKey = EXP_ORDER[i]; renderExposure(true); }, 1600);
+  });
+
+  const END = {
+    "125M": { off: [3.3469, 3.3845], fixed: [3.3469, 3.4361], closed: [3.3469, 6.3942], yd: [3, 7] },
+    "760M": { off: [2.7913, 2.9383], fixed: [2.7913, 3.0116], closed: [2.7913, 8.9405], yd: [2, 10] }
+  };
+  let endKey = "125M";
+  function renderEnd(fromUser) {
+    const d = END[endKey], el = $("#chEnd");
+    $$("#endSeg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.k === endKey)));
+    lineChart(el, { xs: [0, 1], xd: [-.08, 1.08], yd: d.yd, h: 260, dots: true, right: 62, aria: "First vs last real-text NLL",
+      xticks: [[0, t("first check", "第一次检查")], [1, t("last check (128K)", "最后一次（128K）")]], vfmt: v => v.toFixed(2),
+      series: [{ name: t("Closed Loop", "闭环"), c: "closed", vals: d.closed }, { name: t("Fixed Generation", "固定生成"), c: "fixed", vals: d.fixed, dy: -7 }, { name: t("Writes Off", "关闭写入"), c: "off", vals: d.off, dy: 10 }],
+      tipX: v => v ? t("Last check (128K)", "最后一次检查（128K）") : t("First check", "第一次检查") });
+    if (fromUser && !reduce) { hidePaths(el); playDraw(el); }
+  }
+  $$("#endSeg button").forEach(b => b.addEventListener("click", () => { endKey = b.dataset.k; renderEnd(true); }));
+
+  const DOSE = [
+    { a: "0", H: 0, Hl: 0, Hh: 0, B: 0, Bl: 0, Bh: 0 },
+    { a: "1/16", H: .3856, Hl: .1737, Hh: .6432, B: .0412, Bl: .0249, Bh: .0579 },
+    { a: "1/8", H: .8583, Hl: .5480, Hh: 1.2276, B: .0543, Bl: .0328, Bh: .0758 },
+    { a: "1/4", H: .9248, Hl: .6525, Hh: 1.3374, B: .0682, Bl: .0413, Bh: .0942 },
+    { a: "1/2", H: 1.0319, Hl: .6424, Hh: 1.4540, B: .0812, Bl: .0507, Bh: .1106 },
+    { a: "1", H: 1.1867, Hl: .8512, Hh: 1.5056, B: .0922, Bl: .0579, Bh: .1248 },
+    { a: "2", H: 1.9374, Hl: 1.0941, Hh: 2.9775, B: .1009, Bl: .0626, Bh: .1373 }
+  ];
+  function renderDose() {
+    const i = +$("#doseRange").value, el = $("#chDose"), h = 290, l = 52, r = 24, top = 18, b = 48;
+    const c = base(el, h, "Harm vs benefit across write strengths"), w = c.w, x = lin([0, 3], [l, w - r]), y = lin([0, .14], [h - b, top]);
+    niceTicks(0, .14, 4).forEach(v => { c.grid(l, y(v), w - r, y(v)); c.text(l - 8, y(v) + 5, tickFmt(v), "t-k", "end"); });
+    niceTicks(0, 3, narrow(el) ? 3 : 6).forEach(v => { c.grid(x(v), top, x(v), h - b); c.text(x(v), h - b + 18, tickFmt(v), "t-k", "middle"); });
+    c.line(l, h - b, w - r, h - b, P.pencil, 1.3); c.line(l, top, l, h - b, P.pencil, 1.3);
+    c.text((l + w - r) / 2, h - 8, t("harm on self-written streams (nats) → worse", "自写数据流上的伤害（nats）→ 更差"), "t-k", "middle");
+    c.text(l + 8, top + 6, t("↑ benefit on real text (nats)", "↑ 真实文本上的收益（nats）"), "t-k");
+    const d = DOSE[i];
+    c.poly(DOSE.map(p => [x(p.H), y(p.B)]), P.faint, 1.6);
+    if (i > 0) { c.line(x(d.Hl), y(d.B), x(d.Hh), y(d.B), P.closed, 2); c.line(x(d.H), y(d.Bl), x(d.H), y(d.Bh), P.closed, 2); }
+    DOSE.forEach((p, k) => {
+      const on = k === i; c.dot(x(p.H), y(p.B), on ? 15 : 9, on ? P.closed : P.off);
+      if (on || !narrow(el) || k === 0 || k === 6) c.text(x(p.H) + (k === 6 ? -12 : 12), y(p.B) + (k === 0 ? -12 : 18), "α=" + p.a, on ? "t-v" : "t-k", k === 6 ? "end" : "start");
+      c.hitc(x(p.H), y(p.B), 18, `<b>α = ${p.a}</b><br>${t("harm", "伤害")} ${f(p.H, 4)} [${f(p.Hl, 4)}, ${f(p.Hh, 4)}]<br>${t("benefit", "收益")} ${f(p.B, 4)} [${f(p.Bl, 4)}, ${f(p.Bh, 4)}]`);
+    });
+    c.done();
+    $("#doseVal").textContent = "α = " + d.a;
+    $("#doseNote").innerHTML = i === 0 ? t("α = 0 writes nothing: no harm, and no benefit either.", "α = 0 什么也不写：没有伤害，也没有收益。") :
+      t(`At α = ${d.a}: harm <b class="n">${f(d.H, 4)}</b>, benefit <b class="n">${f(d.B, 4)}</b>. Every nonzero step has both. Shrinking writes slides you along this curve; it never gets you off it.`,
+        `α = ${d.a} 时：伤害 <b class="n">${f(d.H, 4)}</b>，收益 <b class="n">${f(d.B, 4)}</b>。每个非零步长都同时有伤害和收益。缩小写入只是沿着这条曲线滑动，永远离不开它。`);
+  }
+  $("#doseRange").addEventListener("input", renderDose);
+  let repKey = "dose";
+  function renderRep(fromUser) {
+    $$("#repSeg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.k === repKey)));
+    ["dose", "decode", "rep"].forEach(k => { $("#rep-" + k).hidden = k !== repKey; });
+    if (repKey === "dose") renderDose();
+    if (repKey === "decode") {
+      const D = [[t("top-p .95 (default)", "top-p .95（默认）"), 3.0097, .1339], ["top-p .99", 3.3531, .1497], ["typical-p .95", 2.9292, .0948], [t("full support", "全支撑采样"), 1.4520, .1979],
+        ["T .7, top-p .95", 2.2246, .1704], [t("repetition penalty", "重复惩罚"), .8794, .0027], [t("reset every 8", "每 8 段重置"), .1749, .0056], [t("reset every 32", "每 32 段重置"), 1.9218, .0623]];
+      const isReset = i => i >= 6;
+      bars($("#chDecE"), { domain: [0, 3.5], d: 3, labelW: 140, rowH: 32, bh: 15, aria: "Endpoint gap", rows: D.map((r, i) => ({ label: r[0], v: r[1], c: isReset(i) ? "fixed" : "closed" })) });
+      bars($("#chDecS"), { domain: [0, .2], d: 4, labelW: 140, rowH: 32, bh: 15, aria: "Late slope", rows: D.map((r, i) => ({ label: r[0], v: r[2], c: isReset(i) ? "fixed" : "closed", vtxt: fs(r[2], 4), flag: r[2] < .006 ? t("flat", "已平") : "" })) });
+    }
+    if (repKey === "rep") {
+      bars($("#chRep"), { domain: [0, 4], d: 2, labelW: 170, rowH: 36, aria: "Repetition-aware controls", rows: [
+        { label: t("Closed Loop", "闭环"), v: 2.8853, lo: 2.0072, hi: 3.8310, c: "closed" },
+        { label: t("Uniform smaller dose", "统一减小剂量"), v: 2.4861, lo: 1.9510, hi: 3.0939, c: "closed" },
+        { label: t("Random smaller dose", "随机减小剂量"), v: 2.0558, lo: 1.6339, hi: 2.4946, c: "closed" },
+        { label: t("Repetition weighting", "重复加权"), v: 1.5637, lo: 1.1858, hi: 1.9825, c: "closed" },
+        { label: t("Read-only real context", "只读真实上下文"), v: 1.3979, lo: 1.0988, hi: 1.7140, c: "closed" },
+        { label: t("Writes Off", "关闭写入"), v: 0, c: "off", vtxt: "0" }] });
+    }
+    if (fromUser && !reduce) { $$("#rep-" + repKey + " .chart").forEach(el => { hidePaths(el); playDraw(el); }); }
+  }
+  $$("#repSeg button").forEach(b => b.addEventListener("click", () => { repKey = b.dataset.k; renderRep(true); }));
+
+  const LAB = { e: [0, .053, .124, .212, .389, .619, .876, 1], sm: [3.8072, 3.8116, 3.8129, 3.8377, 3.8584, 3.9242, 4.0204, 4.2544],
+    st: [3.8196, 3.8230, 3.8248, 3.8286, 3.8215, 3.8270, 3.8243, 3.8244], g: [0, 4, 9, 15, 26, 41, 64, 73], r: [0, 2, 5, 9, 18, 29, 35, 40], sig: [0, 0, 0, 0, 1, 1, 1, 1] };
+  function renderLab() {
+    const i = +$("#labRange").value, d = LAB.st[i] - LAB.sm[i];
+    $("#labVal").textContent = (LAB.e[i] * 100).toFixed(1).replace(/\.0$/, "") + "%";
+    $("#lbG").textContent = LAB.g[i]; $("#lbR").textContent = LAB.r[i]; $("#lbD").textContent = fs(d, 4);
+    $("#lbS").textContent = LAB.sig[i] ? t("interval excludes zero", "区间不含零") : d < 0 ? t("lower, not yet resolved", "更低，但尚未确定") : t("Masking is lower here", "这里屏蔽更低");
+    lineChart($("#chLab"), { xs: LAB.e, xd: [0, 1], yd: [3.75, 4.3], h: 270, right: 30, dots: true, marker: LAB.e[i], aria: "NLL vs label error",
+      xticks: [[0, "0%"], [.2, "20%"], [.4, "40%"], [.6, "60%"], [.8, "80%"], [1, "100%"]], xlabel: t("share of wrong labels", "标错标签的比例"),
+      yfmt: v => v.toFixed(2), vfmt: v => v.toFixed(4),
+      series: [{ name: t("Source Masking", "来源屏蔽"), c: "off", vals: LAB.sm, end: false }, { name: "Settlement", c: "settle", vals: LAB.st, end: false }],
+      tipX: v => t((v * 100).toFixed(1) + "% wrong labels", (v * 100).toFixed(1) + "% 标签错误"),
+      tipExtra: k => t(`<br>Masking keeps ${LAB.g[k]} generated, drops ${LAB.r[k]} real`, `<br>屏蔽保留了 ${LAB.g[k]} 次生成更新，丢掉了 ${LAB.r[k]} 次真实更新`) });
+  }
+  $("#labRange").addEventListener("input", renderLab);
+
+  let alfKey = "8";
+  const ALF = { "8": { c: [27.6, 47.8], s: [91.0, 3.0], acc: "12/36" }, "16": { c: [18.7, 32.3], s: [90.0, 1.1], acc: "7/36" } };
+  function renderAlf(fromUser) {
+    const d = ALF[alfKey], el = $("#chAlf");
+    $$("#alfSeg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.k === alfKey)));
+    const row = (label, sub, v, sd, c) => ({ label, sub, v, lo: Math.max(0, v - sd), hi: Math.min(100, v + sd), c, vtxt: v.toFixed(1), citxt: "± " + sd.toFixed(1) });
+    bars(el, { domain: [0, 100], labelW: 130, rowH: 50, rightW: 56, xlabel: t("% unseen tasks solved", "解决的未见任务 %"), aria: "ALFWorld unseen success", rows: [
+      row(t("Writes Off", "关闭写入"), t("shared baseline", "共享基线"), 86.8, .9, "off"),
+      row(t("Closed Loop", "闭环"), t("keeps every update", "保留每次更新"), d.c[0], d.c[1], "closed"),
+      row("Settlement", t(`keeps ${d.acc} blocks`, `保留 ${d.acc} 个块`), d.s[0], d.s[1], "settle")] });
+    if (fromUser && !reduce) { hidePaths(el); playDraw(el); }
+  }
+  $$("#alfSeg button").forEach(b => b.addEventListener("click", () => { alfKey = b.dataset.k; renderAlf(true); }));
+
+  /* commit-mode cards */
+  function renderModes() {
+    const MODES = [
+      ["ord", t("Just write", "直接写入"), t("Every update changes the live state right away.", "每次更新立刻改变当前状态。"), "+1.56", "+.034", ""],
+      ["joint", t("Check each, commit the sum", "各自检验，合并提交"), t("Each δ is checked alone at W; their unchecked sum is deployed.", "每个 δ 单独在 W 上检验，然后部署它们未经检验的总和。"), "≈ 0", "−1.093", ""],
+      ["seq", t("Check in sequence", "按顺序检验"), t("Each δ is judged on top of the updates already accepted.", "每个 δ 都在已接受的更新之上评判。"), "+.10", "+.019", ""],
+      ["settle", "Settlement", t("Each δ waits for new real text q, then is judged on the state it would join.", "每个 δ 等待新的真实文本 q，再在它将加入的状态上评判。"), "≈ 0", "+.037", "best"]
+    ];
+    $("#modes").innerHTML = MODES.map(m => `<div class="mode sketch ${m[5]}"><h4>${m[1]}</h4><svg viewBox="0 0 220 84" data-k="${m[0]}" aria-hidden="true"></svg><p>${m[2]}</p><div class="hb"><div><div class="k">${t("harm H ↓", "伤害 H ↓")}</div><div class="v">${m[3]}</div></div><div><div class="k">${t("benefit B ↑", "收益 B ↑")}</div><div class="v">${m[4]}</div></div></div></div>`).join("");
+    $$("#modes svg").forEach(svg => {
+      const rc = R.svg(svg), k = svg.dataset.k, tx = [];
+      const node = (id, x, y, s, c) => { svg.appendChild(rc.rectangle(x - 25, y - 13, 50, 26, { seed: seedOf(k + id), stroke: c || P.ink, strokeWidth: 1.5, roughness: .9 })); tx.push(`<text x="${x}" y="${y + 5}" text-anchor="middle" class="d-s" style="fill:var(--ink)">${s}</text>`); };
+      const ar = (id, x1, y1, x2, y2, c) => { const a = Math.atan2(y2 - y1, x2 - x1); svg.appendChild(rc.linearPath([[x1, y1], [x2, y2]], { seed: seedOf(k + id), stroke: c || P.pencil, strokeWidth: 1.4, roughness: .6 })); svg.appendChild(rc.linearPath([[x2 - 8 * Math.cos(a - .5), y2 - 8 * Math.sin(a - .5)], [x2, y2], [x2 - 8 * Math.cos(a + .5), y2 - 8 * Math.sin(a + .5)]], { seed: seedOf(k + id + "h"), stroke: c || P.pencil, strokeWidth: 1.4, roughness: .3 })); };
+      const small = (x, y, s) => tx.push(`<text x="${x}" y="${y}" text-anchor="middle" class="d-n" style="font-size:12.5px">${s}</text>`);
+      if (k === "ord") { node("a", 30, 42, "W"); ar("1", 57, 42, 82, 42); node("b", 110, 42, "+δ₁"); ar("2", 137, 42, 162, 42); node("c", 190, 42, "+δ₂", P.closed); }
+      if (k === "joint") { node("a", 30, 42, "W"); ar("1", 57, 36, 82, 20); ar("2", 57, 48, 82, 64); node("b", 110, 18, "+δ₁"); node("c", 110, 66, "+δ₂"); ar("3", 137, 20, 162, 36, P.closed); ar("4", 137, 64, 162, 48, P.closed); node("d", 190, 42, "Σδ", P.closed); }
+      if (k === "seq") { node("a", 30, 42, "S₀"); ar("1", 57, 42, 82, 42); node("b", 110, 42, "S₁"); ar("2", 137, 42, 162, 42); node("c", 190, 42, "S₂", P.fixed); small(70, 24, t("check", "检验")); small(150, 24, t("check", "检验")); }
+      if (k === "settle") { node("a", 30, 42, "S"); ar("1", 57, 42, 82, 42, P.settle); node("b", 110, 42, "S+δ", P.settle); ar("2", 137, 42, 162, 42, P.settle); node("c", 190, 42, t("keep?", "保留？"), P.settle); small(110, 76, t("waits for new q", "等待新的 q")); }
+      const g = document.createElementNS(NS, "g"); g.innerHTML = tx.join(""); svg.appendChild(g);
+    });
+  }
+
+  /* ---------- render everything ---------- */
+  function renderAll(keepSnake) {
+    readPal();
+    if (keepSnake !== true) drawSnake(false);
+    drawRW();
+    drawCase($("#dgClosed"), "closed"); drawCase($("#dgOff"), "off"); drawCase($("#dgSettle"), "settle");
+    drawCase($("#caseSvg"), caseMode); $("#caseTag").textContent = TAGS()[caseMode];
+    STEPS.forEach(s => s.classList.toggle("on", s.dataset.mode === caseMode));
+    $$("#caseDots button").forEach((b, i) => b.classList.toggle("on", STEPS[i].dataset.mode === caseMode));
+
+    bars($("#chBenefit"), { domain: [0, .4], d: 3, labelW: 170, rowH: 46, xlabel: "nats", aria: "Benefit of writing real text", rows: [
+      { label: "TTT-E2E 125M", sub: t("eleven teacher-forced books", "11 本教师强制的书"), v: .0340, c: "ink", vtxt: ".034" },
+      { label: "TTT-E2E 125M", sub: t("real-text learning, 8 books", "真实文本学习，8 本书"), v: .3544, lo: .1236, hi: .6048, c: "ink", vtxt: ".354" },
+      { label: "Qwen3-4B, LR 1e−4", sub: t("range of two states", "两个状态的范围"), v: .1680, lo: .1317, hi: .2043, c: "ink", vtxt: ".168", citxt: t("range [.132, .204]", "范围 [.132, .204]") },
+      { label: "Qwen3-4B, LR 1e−5", sub: t("range of two states", "两个状态的范围"), v: .1392, lo: .1150, hi: .1634, c: "ink", vtxt: ".139", citxt: t("range [.115, .163]", "范围 [.115, .163]") }] });
+
+    forest($("#chScale"), { domain: [-0.5, 8], d: 2, labelW: 170, xlabel: t("extra NLL, nats → worse", "额外 NLL（nats）→ 更差"), aria: "Damage by model", rows: [
+      { header: "TTT-E2E" },
+      { label: "125M", sub: t("trained on PG-19", "在 PG-19 上训练"), v: 3.01, lo: 1.86, hi: 4.20, c: "closed" },
+      { label: "760M", sub: t("trained on PG-19", "在 PG-19 上训练"), v: 6.00, lo: 4.27, hi: 7.73, c: "closed" },
+      { label: "3B", sub: t("released model", "官方发布模型"), v: .40, lo: .30, hi: .51, c: "closed" },
+      { header: t("Qwen3-4B · plain Adam", "Qwen3-4B · 普通 Adam") },
+      { label: "LR 1e−4", sub: t("last 4 down_proj", "最后 4 个 down_proj"), v: 1.231, lo: .580, hi: 2.350, c: "closed", vtxt: "+1.23" },
+      { label: "LR 1e−5", sub: t("last 4 down_proj", "最后 4 个 down_proj"), v: .026, lo: -.071, hi: .122, c: "off", vtxt: "+.03", note: t("interval includes zero", "区间包含零") }] });
+    renderEnd();
+
+    bars($("#chFixed"), { domain: [0, 8], d: 3, labelW: 64, rowH: 30, bh: 16, aria: "Closed Loop vs Fixed Generation", rows: [
+      { header: "125M" }, { label: t("Closed", "闭环"), v: 3.0097, lo: 1.8575, hi: 4.1972, c: "closed", vtxt: "3.01" }, { label: t("Fixed", "固定"), v: .0516, lo: .0248, hi: .0772, c: "fixed", vtxt: ".052", note: t("98.3% removed", "消除 98.3%") },
+      { header: "760M" }, { label: t("Closed", "闭环"), v: 6.0021, lo: 4.2695, hi: 7.7347, c: "closed", vtxt: "6.00" }, { label: t("Fixed", "固定"), v: .0733, lo: .0538, hi: .0939, c: "fixed", vtxt: ".073", note: t("98.8% removed", "消除 98.8%") }] });
+
+    (function () {
+      const el = $("#chReplay"), rh = 50, top = 4, bot = 30, h = top + 3 * rh + bot, c = base(el, h, "Recorded replay"), w = c.w;
+      const lw = Math.min(110, w * .36), rw = 54, x = lin([0, 4.2], [lw + 8, w - rw]);
+      axisX(c, x, [0, 1, 2, 3, 4], top, h - bot + 4);
+      [[t("125M read", "125M 读"), t("only reading", "只读"), [[1.606, P.off]], "1.61"], [t("125M write", "125M 写"), t("read + keep", "读并保留"), [[1.606, P.off], [2.268, P.closed]], "3.87"], [t("3B write", "3B 写"), t("minus read", "减去读"), [[.1927, P.closed]], ".193", [.1043, .3272]]].forEach((r, i) => {
+        const cy = top + i * rh + rh / 2; let acc = 0;
+        c.text(0, cy - 2, r[0], "t-l"); c.text(0, cy + 15, r[1], "t-s");
+        r[2].forEach(([v, color], k) => { const x0 = x(acc) + (k ? 3 : 0), x1 = x(acc + v); c.rect(x0, cy - 10, x1 - x0, 20, color); if (k === 1) c.text((x0 + x1) / 2, cy - 15, "+2.268", "t-v", "middle"); acc += v; });
+        if (r[4]) c.line(x(r[4][0]), cy, x(r[4][1]), cy, P.ink, 1.4);
+        c.text(w - rw + 10, cy + 5, r[3], "t-v");
+        c.hit(0, cy - rh / 2, w, rh, `<b>${r[0]}</b><br>` + (r[2].length > 1 ? t("reading 1.606 + writing 2.268", "读 1.606 + 写 2.268") : f(r[2][0][0], 3)) + (r[4] ? " [.104, .327]" : ""));
+      });
+      c.done();
+    })();
+
+    (function () {
+      const el = $("#chDrift"), h = 260, l = 40, r = 14, top = 16, b = 40, c = base(el, h, "Drift vs damage"), w = c.w;
+      const x = lin([0, .02], [l, w - r]), y = lin([-.8, 3.4], [h - b, top]);
+      [0, 1, 2, 3].forEach(v => { c.grid(l, y(v), w - r, y(v)); c.text(l - 6, y(v) + 5, tickFmt(v), "t-k", "end"); });
+      c.line(l, y(0), w - r, y(0), P.pencil, 1.2);
+      [0, .01, .02].forEach(v => c.text(x(v), h - b + 18, tickFmt(v), "t-k", "middle"));
+      c.text((l + w - r) / 2, h - 6, t("how far the weights moved", "权重移动了多远"), "t-k", "middle");
+      c.text(l + 4, top + 2, t("↑ damage (nats)", "↑ 损害（nats）"), "t-k");
+      [{ n: t("Closed Loop", "闭环"), d: .00857, e: 2.8308, c: P.closed, a: "start", dx: 12 }, { n: t("Writes Off", "关闭写入"), d: .005, e: 0, c: P.off, a: "end", dx: -12, dy: -12 },
+       { n: t("Fixed Gen.", "固定生成"), d: .01387, e: .0707, c: P.fixed, a: "middle", dx: 0, dy: -16 }, { n: t("Real text", "真实文本"), d: .01759, e: -.3544, c: P.ink, a: "end", dx: -12, dy: 16 }].forEach(p => {
+        c.dot(x(p.d), y(p.e), 14, p.c); c.text(x(p.d) + p.dx, y(p.e) + 5 + (p.dy || 0), p.n, "t-l", p.a);
+        c.hitc(x(p.d), y(p.e), 18, `<b>${p.n}</b><br>${t("drift", "漂移")} ${f(p.d, 5)}<br>${t("damage", "损害")} ${fs(p.e, 4)}`);
+      });
+      c.done();
+    })();
+
+    const H3 = [t("Writes Off", "关闭写入"), t("Closed Loop", "闭环"), t("Fixed Gen.", "固定生成")];
+    forest($("#chSrc"), { domain: [-.16, .01], d: 4, labelW: 96, rightW: 62, ticks: 3, aria: "Source NLL change", rows: [
+      { label: H3[0], v: -.1374, lo: -.1453, hi: -.1285, c: "off", vtxt: "−.137" },
+      { label: H3[1], v: -.0354, lo: -.0384, hi: -.0317, c: "closed", vtxt: "−.035" },
+      { label: H3[2], v: -.1449, lo: -.1482, hi: -.1407, c: "fixed", vtxt: "−.145" }] });
+    forest($("#chNext"), { domain: [-.01, .08], d: 4, labelW: 96, rightW: 62, ticks: 3, aria: "Next real-text NLL change", rows: [
+      { label: H3[0], v: .0045, lo: .0037, hi: .0053, c: "off", vtxt: "+.005" },
+      { label: H3[1], v: .0381, lo: .0098, hi: .0718, c: "closed", vtxt: "+.038" },
+      { label: H3[2], v: .0018, lo: .0014, hi: .0023, c: "fixed", vtxt: "+.002" }] });
+    lineChart($("#chPos"), { xs: [1, 33, 65, 97], xd: [-2, 100], yd: [0, .12], h: 250, dots: true, right: 60, aria: "One-update cost by position",
+      xticks: [[1, "1"], [33, "33"], [65, "65"], [97, "97"]], xlabel: t("position in the stream (generated chunks)", "在数据流中的位置（生成段序号）"),
+      series: [{ name: t("Closed Loop", "闭环"), c: "closed", vals: [.0062, .0087, .0250, .1126] }, { name: t("Writes Off", "关闭写入"), c: "off", vals: [.0063, .0044, .0038, .0037], dy: -7 }, { name: t("Fixed Generation", "固定生成"), c: "fixed", vals: [.0042, .0008, .0011, .0012], dy: 10 }],
+      tipX: v => t("Position ", "位置 ") + v });
+
+    const ST = [1, 17, 33, 49, 65, 81, 97], CNT = [0, 3, 3, 6, 9, 9, 12];
+    lineChart($("#chTail"), { xs: ST, xd: [-3, 101], yd: [0, .8], h: 250, dots: true, right: 54, aria: "Mean vs median write cost",
+      xticks: ST.map(v => [v, String(v)]), xlabel: t("source position", "源位置"),
+      series: [{ name: t("mean", "均值"), c: "ink", vals: [.0439, .0898, .1399, .3135, .4855, .4858, .7512] }, { name: t("median", "中位数"), c: "off", vals: [.0422, .0040, .0039, .0042, .0047, .0105, .0064] }],
+      tipX: v => t("Position ", "位置 ") + v, tipExtra: i => t(`<br>disasters: ${CNT[i]}/72`, `<br>灾难：${CNT[i]}/72`) });
+    (function () {
+      const el = $("#chCount"), h = 250, l = 30, r = 10, top = 16, b = 46, c = base(el, h, "Count above 0.5 nats"), w = c.w;
+      const xs = lin([0, ST.length], [l, w - r]), y = lin([0, 14], [h - b, top]), bw = Math.min(26, (w - l - r) / ST.length * .6);
+      [0, 4, 8, 12].forEach(v => { c.grid(l, y(v), w - r, y(v)); c.text(l - 6, y(v) + 5, v, "t-k", "end"); });
+      c.line(l, y(0), w - r, y(0), P.pencil, 1.3);
+      ST.forEach((p, i) => {
+        const cx = (xs(i) + xs(i + 1)) / 2;
+        if (CNT[i]) c.rect(cx - bw / 2, y(CNT[i]), bw, y(0) - y(CNT[i]), P.closed, { hachureAngle: 60 });
+        c.text(cx, y(CNT[i]) - 7, CNT[i], "t-v", "middle"); c.text(cx, h - b + 18, p, "t-k", "middle");
+        c.hit(xs(i), top, xs(i + 1) - xs(i), h - b - top, t(`<b>Position ${p}</b><br>${CNT[i]} of 72 above .5 nats`, `<b>位置 ${p}</b><br>72 次中有 ${CNT[i]} 次超过 .5 nats`));
+      });
+      c.text((l + w - r) / 2, h - 6, t("source position", "源位置"), "t-k", "middle");
+      c.done();
+    })();
+
+    renderExposure(); renderRep();
+
+    forest($("#chSettle"), { domain: [-.5, 4.5], d: 3, labelW: 120, rightW: 58, xlabel: t("gap to Writes Off, nats", "与关闭写入的差距（nats）"), aria: "Settlement endpoint", rows: [
+      { header: t("125M · 12 books", "125M · 12 本书") }, { label: t("Closed Loop", "闭环"), v: 3.183, lo: 2.106, hi: 4.253, c: "closed", vtxt: "3.18" }, { label: "Settlement", v: .067, lo: -.013, hi: .169, c: "settle", vtxt: ".07", note: t("keeps 22/936 generated updates", "保留 22/936 次生成更新") },
+      { header: t("760M · 4 books", "760M · 4 本书") }, { label: t("Closed Loop", "闭环"), v: 1.263, lo: .799, hi: 1.618, c: "closed", vtxt: "1.26" }, { label: "Settlement", v: -.021, lo: -.058, hi: .014, c: "settle", vtxt: "−.02", note: t("keeps 18/312 generated updates", "保留 18/312 次生成更新") }] });
+    renderModes();
+
+    (function () {
+      const R4 = [[t("Just write", "直接写入"), 3.06, [.67, 7.02], .04, [0, .09]], [t("Quarter-size writes", "四分之一写入"), .90, [.32, 1.97], .02, [-.01, .04]], [t("+ read-only real text", "+ 只读真实文本"), 1.04, [.19, 2.59], -.02, [-.03, 0]], [t("both", "两者都用"), .28, [.13, .53], .00, [-.01, .02]]];
+      const el = $("#chAbl"), rh = 42, top = 4, bot = 40, h = top + R4.length * rh + bot, c = base(el, h, "Component ablation"), w = c.w;
+      const lw = Math.min(150, w * .4), rw = 84, x = lin([-.2, 3.4], [lw + 10, w - rw]);
+      axisX(c, x, [0, 1, 2, 3], top, h - bot + 4, t("nats above Writes Off", "高于关闭写入（nats）"));
+      R4.forEach((r, i) => {
+        const cy = top + i * rh + rh / 2;
+        c.text(0, cy + 5, r[0], "t-l");
+        c.line(x(r[3]), cy, x(r[1]), cy, P.faint, 1.6, { strokeLineDash: [4, 4] });
+        c.dot(x(r[1]), cy, 13, P.closed); c.dot(x(r[3]), cy, 13, P.settle);
+        c.text(w - rw + 10, cy + 5, `${f(r[1], 2)} → ${f(r[3], 2)}`, "t-v");
+        c.hit(0, cy - rh / 2, w, rh, `<b>${r[0]}</b><br>${t("without check", "不检验")} ${f(r[1], 2)} [${f(r[2][0], 2)}, ${f(r[2][1], 2)}]<br>${t("with Settlement", "加上 Settlement")} ${f(r[3], 2)} [${f(r[4][0], 2)}, ${f(r[4][1], 2)}]`);
+      });
+      c.done();
+    })();
+    bars($("#chAllReal"), { domain: [0, .08], d: 4, labelW: 120, rowH: 46, xlabel: "nats", aria: "All-real stream", rows: [
+      { label: t("Reject all", "全部拒绝"), sub: t("0/113 kept", "保留 0/113"), v: 0, c: "off", vtxt: "0" },
+      { label: t("Write all", "全部写入"), sub: t("113/113 kept", "保留 113/113"), v: .0450, lo: .0235, hi: .0609, c: "ink" },
+      { label: "Settlement", sub: t("89/113 kept", "保留 89/113"), v: .0534, lo: .0299, hi: .0721, c: "settle" }] });
+    renderLab();
+    bars($("#chWeb"), { domain: [0, .25], d: 3, labelW: 130, rowH: 50, rightW: 56, xlabel: t("exact success", "完全成功率"), aria: "WebShop", rows: [
+      { label: t("Writes Off", "关闭写入"), sub: t("no updates", "不更新"), v: .1600, c: "off", vtxt: ".160" },
+      { label: t("Closed Loop", "闭环"), sub: t("180/180 blocks kept", "保留 180/180 块"), v: .1053, lo: .0456, hi: .1650, c: "closed", vtxt: ".105", citxt: "± .060 SD" },
+      { label: t("Fixed Generation", "固定生成"), sub: t("180/180 blocks kept", "保留 180/180 块"), v: .1800, lo: .1711, hi: .1889, c: "fixed", vtxt: ".180", citxt: "± .009 SD" },
+      { label: "Settlement", sub: t("10/180 blocks kept", "保留 10/180 块"), v: .1853, lo: .1651, hi: .2055, c: "settle", vtxt: ".185", citxt: "± .020 SD" }] });
+    renderAlf();
+    renderGuess(false); guessMsg();
+  }
+
+  /* ---------- language switch ---------- */
+  function applyLang(l, rerender) {
+    LANG = l === "zh" ? "zh" : "en";
+    root.dataset.lang = LANG; root.lang = LANG === "zh" ? "zh-CN" : "en";
+    store.set("ttt-lang", LANG);
+    try { history.replaceState(null, "", LANG === "zh" ? "#zh" : location.pathname + location.search); } catch (e) {}
+    if (rerender) {
+      renderAll(true); drawSnake(false);
+      $$("mark.pre").forEach(m => m.classList.remove("pre"));
+    }
+  }
+  const hash = (location.hash || "").slice(1);
+  applyLang(hash === "zh" ? "zh" : hash === "en" ? "en" : (store.get("ttt-lang") || "en"), false);
+  const toggleLang = () => applyLang(LANG === "zh" ? "en" : "zh", true);
+  $("#langBtn").addEventListener("click", toggleLang);
+  $$("[data-lang-switch]").forEach(b => b.addEventListener("click", () => { toggleLang(); window.scrollTo({ top: 0, behavior: "auto" }); }));
+
+  /* ---------- text size ---------- */
+  const SIZES = [1, 1.1, 1.22];
+  let fsi = Math.max(0, SIZES.indexOf(+store.get("ttt-fs")));
+  const applyFs = () => { root.style.setProperty("--fsz", SIZES[fsi]); $("#fsBtn").style.fontSize = (14 + fsi * 2) + "px"; };
+  applyFs();
+  $("#fsBtn").addEventListener("click", () => { fsi = (fsi + 1) % SIZES.length; store.set("ttt-fs", SIZES[fsi]); applyFs(); });
+
+  /* ---------- boot ---------- */
+  renderAll();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => renderAll(true));
+  let rt, lastW = innerWidth;
+  addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { if (innerWidth !== lastW) { lastW = innerWidth; renderAll(true); drawSnake(false); } }, 150); });
+  const mq = matchMedia("(prefers-color-scheme: dark)");
+  if (mq.addEventListener) mq.addEventListener("change", () => renderAll());
+  new MutationObserver(ms => { if (ms.some(m => m.attributeName === "data-theme")) renderAll(); }).observe(root, { attributes: true });
+
+  /* highlighter swipe for marks below the fold */
+  if ("IntersectionObserver" in window && !reduce) {
+    const markIO = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.remove("pre"); markIO.unobserve(e.target); } }), { rootMargin: "0px 0px -15% 0px" });
+    $$("mark").forEach(m => { const r = m.getBoundingClientRect(); if (r.height && r.top > innerHeight) { m.classList.add("pre"); markIO.observe(m); } });
+    // count-up for the headline cards
+    const cIO = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { cIO.unobserve(e.target); countUp(e.target); } }), { threshold: .6 });
+    $$("[data-count]").forEach(el => cIO.observe(el));
+  }
+  function countUp(el) {
+    const final = el.textContent.trim(), m = final.match(/^([+−-]?)(\d*)\.?(\d*)(%?)$/);
+    if (!m) return;
+    const dec = m[3].length, val = parseFloat((m[2] || "0") + "." + (m[3] || "0")), lead = final.startsWith(".") || final.startsWith("+.");
+    const t0 = performance.now(), dur = 1100;
+    const step = now => {
+      const k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+      let s = (val * e).toFixed(dec); if (lead && s.startsWith("0.")) s = s.slice(1);
+      el.textContent = m[1] + s + m[4];
+      if (k < 1) requestAnimationFrame(step); else el.textContent = final;
+    };
+    requestAnimationFrame(step);
+  }
+
+  /* chapter highlight + progress bar + back-to-top (one rAF-throttled scroll handler) */
+  const links = $$("#nav a"), secs = links.map(a => $(a.getAttribute("href")));
+  const sheetNav = $("#sheetNav"); sheetNav.innerHTML = $("#nav").innerHTML;
+  const sheetLinks = $$("a", sheetNav);
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver(es => es.forEach(e => {
+      if (!e.isIntersecting) return;
+      const i = secs.indexOf(e.target);
+      links.forEach((a, k) => a.classList.toggle("on", k === i)); sheetLinks.forEach((a, k) => a.classList.toggle("on", k === i));
+      const nav = $("#nav"), a = links[i];
+      if (a && nav.scrollWidth > nav.clientWidth) nav.scrollLeft = a.offsetLeft - nav.offsetLeft - 16;
+    }), { rootMargin: "-40% 0px -55% 0px" });
+    secs.forEach(s => s && io.observe(s));
+  }
+  const prog = $("#progress"), fab = $("#fab");
+  let ticking = false;
+  const onScroll = () => {
+    if (ticking) return; ticking = true;
+    requestAnimationFrame(() => {
+      const max = document.documentElement.scrollHeight - innerHeight;
+      prog.style.transform = `scaleX(${max > 0 ? Math.min(1, scrollY / max) : 0})`;
+      fab.classList.toggle("off", scrollY < innerHeight * 1.5);
+      if (!tip.hidden) tip.hidden = true;
+      ticking = false;
+    });
+  };
+  addEventListener("scroll", onScroll, { passive: true }); onScroll();
+  fab.addEventListener("click", () => window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" }));
+
+  /* chapter sheet */
+  const sheet = $("#sheet"), menuBtn = $("#menuBtn");
+  const openSheet = () => { sheet.hidden = false; menuBtn.setAttribute("aria-expanded", "true"); const a = sheetLinks.find(x => x.classList.contains("on")) || sheetLinks[0]; a && a.focus(); };
+  const closeSheet = () => { sheet.hidden = true; menuBtn.setAttribute("aria-expanded", "false"); };
+  menuBtn.addEventListener("click", () => sheet.hidden ? openSheet() : closeSheet());
+  $$("[data-close]", sheet).forEach(b => b.addEventListener("click", closeSheet));
+  sheetLinks.forEach(a => a.addEventListener("click", closeSheet));
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && !sheet.hidden) { closeSheet(); menuBtn.focus(); } });
+
+  $("#copyBib").addEventListener("click", () => {
+    const btn = $("#copyBib"), txt = $("#bibtex").textContent, en = btn.querySelector(".en"), zh = btn.querySelector(".zh");
+    const done = ok => { en.textContent = ok ? "Copied!" : "Select & copy"; zh.textContent = ok ? "已复制" : "请手动复制"; setTimeout(() => { en.textContent = "Copy"; zh.textContent = "复制"; }, 1800); };
+    const sel = () => { const r = document.createRange(); r.selectNodeContents($("#bibtex")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); };
+    try { navigator.clipboard.writeText(txt).then(() => done(true), () => { sel(); done(false); }); } catch (e) { sel(); done(false); }
+  });
+})();
+</script>
+</body>
+</html>
