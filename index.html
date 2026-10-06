@@ -189,6 +189,16 @@ p { margin: 0 0 16px; }
 @media (max-width: 760px) { .cards { grid-template-columns: 1fr; gap: 16px; } .card { transform: none !important; } }
 @media (min-width: 761px) and (max-width: 1000px) { .cards { gap: 14px; } .card .big { font-size: 34px; } }
 
+/* Video preview keeps the notebook style and opens YouTube on demand. */
+.video-feature { max-width: 40rem; margin: 48px 0 8px; }
+.video-feature .fig-h { margin-bottom: 10px; }
+.video-link { display: block; position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: var(--card); color: white; text-decoration: none; }
+.video-link img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.video-link::after { content: ""; position: absolute; inset: 0; background: linear-gradient(transparent 55%, rgba(0, 0, 0, .42)); pointer-events: none; }
+.video-play { position: absolute; z-index: 1; left: 50%; top: 50%; transform: translate(-50%, -50%); display: grid; place-items: center; width: 72px; height: 52px; border-radius: 15px; background: #e62117; box-shadow: 0 3px 12px rgba(0, 0, 0, .35); font: 29px/1 sans-serif; padding-left: 4px; transition: transform .16s; }
+.video-link:hover .video-play, .video-link:focus-visible .video-play { transform: translate(-50%, -50%) scale(1.08); }
+.video-caption { font-family: var(--f-hand); font-size: 15px; color: var(--pencil); margin-top: 8px; }
+
 /* ---------- figures ---------- */
 figure { margin: 26px 0 34px; }
 .fig-h { font-family: var(--f-hand); font-weight: 700; font-size: 19px; line-height: 1.3; }
@@ -436,6 +446,7 @@ footer { margin-top: 56px; padding-top: 18px; border-top: 1.5px dashed var(--rul
       <a class="btn primary" href="https://arxiv.org/abs/2610.05076" target="_blank" rel="noopener"><span class="en">Paper</span><span class="zh">论文</span></a>
       <a class="btn" href="https://arxiv.org/pdf/2610.05076v1" target="_blank" rel="noopener">PDF</a>
       <a class="btn" href="https://github.com/lingjivoo/ttt-ouroboros" target="_blank" rel="noopener"><span class="en">Code</span><span class="zh">代码</span></a>
+      <a class="btn" href="#video"><span class="en">Video</span><span class="zh">视频</span></a>
       <a class="btn" href="#cite">BibTeX</a>
       <button class="btn zhbtn" type="button" data-lang-switch><span class="en" lang="zh-CN">中文版 →</span><span class="zh">English →</span></button>
     </div>
@@ -459,6 +470,15 @@ footer { margin-top: 56px; padding-top: 18px; border-top: 1.5px dashed var(--rul
   <div class="card sketch"><div class="big o" data-count>+3.01</div><p class="en">nats worse at predicting real text after 128K tokens of self-writing (125M model)</p><p class="zh">125M 模型自我写入 128K token 后，预测真实文本的损失多出 3.01 nats</p></div>
   <div class="card sketch"><div class="big b" data-count>98%</div><p class="en">of that damage disappears when a frozen copy does the writing instead</p><p class="zh">换成一个冻结的副本来写，这部分损害几乎全部消失</p></div>
   <div class="card sketch"><div class="big g" data-count>.07</div><p class="en">nats left once Settlement checks each update on independent real text</p><p class="zh">用 Settlement 在独立真实文本上检验每次更新后，只剩下这么多 nats</p></div>
+</div>
+
+<div class="video-feature" id="video">
+  <div class="fig-h"><span class="en">Watch the paper</span><span class="zh">观看论文视频</span></div>
+  <a class="video-link sketch" href="https://www.youtube.com/watch?v=mBityaXUTi8" target="_blank" rel="noopener noreferrer" aria-label="Watch the TTT Ouroboros video on YouTube">
+    <img src="https://i.ytimg.com/vi/mBityaXUTi8/hqdefault.jpg" alt="TTT Ouroboros video thumbnail" loading="lazy" decoding="async">
+    <span class="video-play" aria-hidden="true">▶</span>
+  </a>
+  <p class="video-caption"><span class="en">Watch on YouTube ↗</span><span class="zh">在 YouTube 观看 ↗</span></p>
 </div>
 
 <!-- ============ 1 ============ -->
